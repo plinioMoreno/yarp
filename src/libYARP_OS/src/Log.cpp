@@ -9,8 +9,10 @@
 #include <yarp/os/Log.h>
 #include <yarp/os/impl/LogImpl.h>
 #include <yarp/os/impl/LogForwarder.h>
+#include <yarp/os/impl/PlatformThread.h>
 
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 
@@ -58,6 +60,9 @@
  #define CLEAR   ""
 
 #endif // WIN32
+
+
+#define THREAD_ID (int)(long int)(PLATFORM_THREAD_SELF())
 
 static bool from_env(const char* name, bool defaultvalue) {
     const char *strvalue = yarp::os::getenv(name);
@@ -163,6 +168,7 @@ void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
 
     if (verbose_output) {
         *ost << file << ":" << line << " " << color << bgcolor << func << CLEAR;
+        *ost << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
         *ost << (msg[0] ? ": " : "");
     } else if (t == yarp::os::Log::TraceType) {
         *ost << WHITE << func << CLEAR << (msg[0] ? ": " : "");
@@ -218,6 +224,7 @@ void yarp::os::impl::LogImpl::forward_callback(yarp::os::Log::LogType t,
 
     if (verbose_output) {
         stringstream_buffer << file << ":" << line << " " << func;
+        stringstream_buffer << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
         stringstream_buffer << (msg[0] ? ": " : "");
     } else if (t == yarp::os::Log::TraceType) {
         stringstream_buffer << func << (msg[0] ? ": " : "");
