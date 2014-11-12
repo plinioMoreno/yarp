@@ -19,6 +19,11 @@ public:
             const unsigned int line,
             const char *func);
 
+    void log(yarp::os::Log::LogType type,
+             bool forward,
+             const char *msg,
+             va_list args) const;
+
     static void print_callback(yarp::os::Log::LogType t,
                                const char *msg,
                                const char *file,

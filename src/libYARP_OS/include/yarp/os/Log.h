@@ -73,12 +73,26 @@ public:
     void error(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
     void fatal(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
 
+    void nofw_trace(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
+    void nofw_debug(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
+    void nofw_info(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
+    void nofw_warning(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
+    void nofw_error(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
+    void nofw_fatal(const char *msg, ...) const YARP_ATTRIBUTE_FORMAT(printf, 2, 3);
+
     LogStream trace() const;
     LogStream debug() const;
     LogStream info() const;
     LogStream warning() const;
     LogStream error() const;
     LogStream fatal() const;
+
+    LogStream nofw_trace() const;
+    LogStream nofw_debug() const;
+    LogStream nofw_info() const;
+    LogStream nofw_warning() const;
+    LogStream nofw_error() const;
+    LogStream nofw_fatal() const;
 
 #ifndef YARP_NO_DEPRECATED
     YARP_DEPRECATED virtual void debug(const ConstString& txt) const { debug("%s", txt.c_str()); } ///< \deprecated since YARP 2.3.64
@@ -115,6 +129,13 @@ private:
 #define yWarning yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).warning
 #define yError   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).error
 #define yFatal   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).fatal
+
+#define yTraceNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_trace
+#define yDebugNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_debug
+#define yInfoNoFw    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_info
+#define yWarningNoFw yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_warning
+#define yErrorNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_error
+#define yFatalNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_fatal
 
 #define yAssert(x)  if (!(x)) { yFatal("Assertion failure (%s)", #x); }
 

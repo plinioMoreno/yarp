@@ -28,12 +28,13 @@ namespace os {
 
 class YARP_OS_API LogStream {
     struct Stream {
-        Stream(Log::LogType t, const char *fn, unsigned int l, const char *f) : type(t), file(fn), line(l), func(f), ref(1) {}
+        Stream(Log::LogType t, const char *fn, unsigned int l, const char *f) : type(t), file(fn), line(l), func(f), fw(true), ref(1) {}
                std::ostringstream oss;
                Log::LogType type;
                const char *file;
                unsigned int line;
                const char *func;
+               bool fw;
                int ref;
     } *stream;
 public:
@@ -55,7 +56,7 @@ public:
             if (Log::print_callback) {
                 Log::print_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func);
             }
-            if (Log::forward_callback) {
+            if (stream->fw && Log::forward_callback) {
                 Log::forward_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func);
             }
             if (stream->type == yarp::os::Log::FatalType) {
@@ -65,6 +66,11 @@ public:
             }
             delete stream;
         }
+    }
+
+    inline LogStream& nofw() {
+        stream->fw = false;
+        return *this;
     }
 
     inline LogStream& operator<<(bool t) {

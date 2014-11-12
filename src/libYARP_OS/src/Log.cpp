@@ -244,11 +244,10 @@ yarp::os::Log::~Log()
     delete mPriv;
 }
 
-
-void yarp::os::Log::trace(const char *msg, ...) const
+inline void yarp::os::impl::LogImpl::log(yarp::os::Log::LogType type,
+                                         bool forward,
+                                         const char *msg, va_list args) const
 {
-    va_list args;
-    va_start(args, msg);
     if (msg) {
         char buf[YARP_MAX_LOG_MSG_SIZE];
         int w =ACE_OS::vsnprintf(buf, YARP_MAX_LOG_MSG_SIZE, msg, args);
@@ -256,12 +255,27 @@ void yarp::os::Log::trace(const char *msg, ...) const
             buf[w-1]=0;
         }
         if (print_callback) {
-            print_callback(yarp::os::Log::TraceType, buf, mPriv->file, mPriv->line, mPriv->func);
+            print_callback(type, buf, file, line, func);
         }
-        if (forward_callback) {
-            forward_callback(yarp::os::Log::TraceType, buf, mPriv->file, mPriv->line, mPriv->func);
+        if (forward && forward_callback) {
+            forward_callback(type, buf, file, line, func);
         }
     }
+}
+
+void yarp::os::Log::trace(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::TraceType, true, msg, args);
+    va_end(args);
+}
+
+void yarp::os::Log::nofw_trace(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::TraceType, false, msg, args);
     va_end(args);
 }
 
@@ -270,24 +284,24 @@ yarp::os::LogStream yarp::os::Log::trace() const
     return yarp::os::LogStream(yarp::os::Log::TraceType, mPriv->file, mPriv->line, mPriv->func);
 }
 
+yarp::os::LogStream yarp::os::Log::nofw_trace() const
+{
+    return yarp::os::LogStream(yarp::os::Log::TraceType, mPriv->file, mPriv->line, mPriv->func).nofw();
+}
 
 void yarp::os::Log::debug(const char *msg, ...) const
 {
     va_list args;
     va_start(args, msg);
-    if (msg) {
-        char buf[YARP_MAX_LOG_MSG_SIZE];
-        int w = ACE_OS::vsnprintf(buf, YARP_MAX_LOG_MSG_SIZE, msg, args);
-        if (w>0 && buf[w-1]=='\n') {
-            buf[w-1]=0;
-        }
-        if (print_callback) {
-            print_callback(yarp::os::Log::DebugType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-        if (forward_callback) {
-            forward_callback(yarp::os::Log::DebugType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-    }
+    mPriv->log(yarp::os::Log::DebugType, true, msg, args);
+    va_end(args);
+}
+
+void yarp::os::Log::nofw_debug(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::DebugType, false, msg, args);
     va_end(args);
 }
 
@@ -296,24 +310,25 @@ yarp::os::LogStream yarp::os::Log::debug() const
     return yarp::os::LogStream(yarp::os::Log::DebugType, mPriv->file, mPriv->line, mPriv->func);
 }
 
+yarp::os::LogStream yarp::os::Log::nofw_debug() const
+{
+    return yarp::os::LogStream(yarp::os::Log::DebugType, mPriv->file, mPriv->line, mPriv->func).nofw();
+}
+
 
 void yarp::os::Log::info(const char *msg, ...) const
 {
     va_list args;
     va_start(args, msg);
-    if (msg) {
-        char buf[YARP_MAX_LOG_MSG_SIZE];
-        int w = ACE_OS::vsnprintf(buf, YARP_MAX_LOG_MSG_SIZE, msg, args);
-        if (w>0 && buf[w-1]=='\n') {
-            buf[w-1]=0;
-        }
-        if (print_callback) {
-            print_callback(yarp::os::Log::InfoType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-        if (forward_callback) {
-            forward_callback(yarp::os::Log::InfoType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-    }
+    mPriv->log(yarp::os::Log::InfoType, true, msg, args);
+    va_end(args);
+}
+
+void yarp::os::Log::nofw_info(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::InfoType, false, msg, args);
     va_end(args);
 }
 
@@ -322,24 +337,25 @@ yarp::os::LogStream yarp::os::Log::info() const
     return yarp::os::LogStream(yarp::os::Log::InfoType, mPriv->file, mPriv->line, mPriv->func);
 }
 
+yarp::os::LogStream yarp::os::Log::nofw_info() const
+{
+    return yarp::os::LogStream(yarp::os::Log::InfoType, mPriv->file, mPriv->line, mPriv->func).nofw();
+}
+
 
 void yarp::os::Log::warning(const char *msg, ...) const
 {
     va_list args;
     va_start(args, msg);
-    if (msg) {
-        char buf[YARP_MAX_LOG_MSG_SIZE];
-        int w = ACE_OS::vsnprintf(buf, YARP_MAX_LOG_MSG_SIZE, msg, args);
-        if (w>0 && buf[w-1]=='\n') {
-            buf[w-1]=0;
-        }
-        if (print_callback) {
-            print_callback(yarp::os::Log::WarningType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-        if (forward_callback) {
-            forward_callback(yarp::os::Log::WarningType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-    }
+    mPriv->log(yarp::os::Log::WarningType, true, msg, args);
+    va_end(args);
+}
+
+void yarp::os::Log::nofw_warning(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::WarningType, false, msg, args);
     va_end(args);
 }
 
@@ -348,24 +364,25 @@ yarp::os::LogStream yarp::os::Log::warning() const
     return yarp::os::LogStream(yarp::os::Log::WarningType, mPriv->file, mPriv->line, mPriv->func);
 }
 
+yarp::os::LogStream yarp::os::Log::nofw_warning() const
+{
+    return yarp::os::LogStream(yarp::os::Log::WarningType, mPriv->file, mPriv->line, mPriv->func).nofw();
+}
+
 
 void yarp::os::Log::error(const char *msg, ...) const
 {
     va_list args;
     va_start(args, msg);
-    if (msg) {
-        char buf[YARP_MAX_LOG_MSG_SIZE];
-        int w = ACE_OS::vsnprintf(buf, YARP_MAX_LOG_MSG_SIZE, msg, args);
-        if (w>0 && buf[w-1]=='\n') {
-            buf[w-1]=0;
-        }
-        if (print_callback) {
-            print_callback(yarp::os::Log::ErrorType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-        if (forward_callback) {
-            forward_callback(yarp::os::Log::ErrorType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-    }
+    mPriv->log(yarp::os::Log::ErrorType, true, msg, args);
+    va_end(args);
+}
+
+void yarp::os::Log::nofw_error(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::ErrorType, false, msg, args);
     va_end(args);
 }
 
@@ -373,26 +390,26 @@ yarp::os::LogStream yarp::os::Log::error() const
 {
     return yarp::os::LogStream(yarp::os::Log::ErrorType, mPriv->file, mPriv->line, mPriv->func);
 }
-
-
+yarp::os::LogStream yarp::os::Log::nofw_error() const
+{
+    return yarp::os::LogStream(yarp::os::Log::ErrorType, mPriv->file, mPriv->line, mPriv->func).nofw();
+}
 
 void yarp::os::Log::fatal(const char *msg, ...) const
 {
     va_list args;
     va_start(args, msg);
-    if (msg) {
-        char buf[YARP_MAX_LOG_MSG_SIZE];
-        int w = ACE_OS::vsnprintf(buf, YARP_MAX_LOG_MSG_SIZE, msg, args);
-        if (w>0 && buf[w-1]=='\n') {
-            buf[w-1]=0;
-        }
-        if (print_callback) {
-            print_callback(yarp::os::Log::FatalType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-        if (forward_callback) {
-            forward_callback(yarp::os::Log::FatalType, buf, mPriv->file, mPriv->line, mPriv->func);
-        }
-    }
+    mPriv->log(yarp::os::Log::FatalType, true, msg, args);
+    va_end(args);
+    yarp_print_trace(stderr, mPriv->file, mPriv->line);
+    yarp::os::exit(-1);
+}
+
+void yarp::os::Log::nofw_fatal(const char *msg, ...) const
+{
+    va_list args;
+    va_start(args, msg);
+    mPriv->log(yarp::os::Log::FatalType, false, msg, args);
     va_end(args);
     yarp_print_trace(stderr, mPriv->file, mPriv->line);
     yarp::os::exit(-1);
@@ -402,6 +419,12 @@ yarp::os::LogStream yarp::os::Log::fatal() const
 {
     return yarp::os::LogStream(yarp::os::Log::FatalType, mPriv->file, mPriv->line, mPriv->func);
 }
+
+yarp::os::LogStream yarp::os::Log::nofw_fatal() const
+{
+    return yarp::os::LogStream(yarp::os::Log::FatalType, mPriv->file, mPriv->line, mPriv->func).nofw();
+}
+
 
 void yarp::os::Log::setLogCallback(yarp::os::Log::LogCallback cb)
 {
