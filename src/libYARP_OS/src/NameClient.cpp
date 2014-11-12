@@ -204,8 +204,7 @@ String NameClient::send(const String& cmd, bool multi) {
                 server.setTimeout(timeout);
                 ip = face.write(server);
                 if (ip==NULL) {
-                    YARP_ERROR(Logger::get(),
-                               "no connection to nameserver, scanning mcast");
+                    yErrorNoFw("no connection to nameserver, scanning mcast");
                     return "";
                 }
             } else {
@@ -429,7 +428,7 @@ NameClient::NameClient() {
 void NameClient::setup() {
     if ((!fake)&&(!isSetup)) {
         if (!updateAddress()) {
-            YARP_ERROR(Logger::get(),"Cannot find name server");
+            yErrorNoFw("Cannot find name server");
         }
 
         YARP_DEBUG(Logger::get(),String("name server address is ") + 

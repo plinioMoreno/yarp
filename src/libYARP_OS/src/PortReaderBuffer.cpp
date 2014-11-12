@@ -477,12 +477,12 @@ bool PortReaderBufferBase::read(ConnectionReader& connection) {
         if (!pruned) {
             HELPER(implementation).contentSema.post();
         }
-        //YARP_ERROR(Logger::get(),">>>>>>>>>>>>>>>>> adding data");
+        //yErrorNoFw(">>>>>>>>>>>>>>>>> adding data");
     } else {
         HELPER(implementation).stateSema.wait();
         HELPER(implementation).pool.addInactivePacket(reader);
         HELPER(implementation).stateSema.post();
-        //YARP_ERROR(Logger::get(),">>>>>>>>>>>>>>>>> skipping data");
+        //yErrorNoFw(">>>>>>>>>>>>>>>>> skipping data");
 
         // important to give reader a shot anyway, allowing proper closing
         YARP_DEBUG(Logger::get(), "giving PortReaderBuffer chance to close");
@@ -582,12 +582,12 @@ bool PortReaderBufferBase::acceptObjectBase(PortReader *obj,
         if (!pruned) {
             HELPER(implementation).contentSema.post();
         }
-        //YARP_ERROR(Logger::get(),">>>>>>>>>>>>>>>>> adding data");
+        //yErrorNoFw(">>>>>>>>>>>>>>>>> adding data");
     } else {
         HELPER(implementation).stateSema.wait();
         HELPER(implementation).pool.addInactivePacket(reader);
         HELPER(implementation).stateSema.post();
-        //YARP_ERROR(Logger::get(),">>>>>>>>>>>>>>>>> skipping data");
+        //yErrorNoFw(">>>>>>>>>>>>>>>>> skipping data");
 
         // important to give reader a shot anyway, allowing proper closing
         YARP_DEBUG(Logger::get(), "giving PortReaderBuffer chance to close");
@@ -627,7 +627,7 @@ void PortReaderBufferBase::clear() {
 }
 
 void typedReaderMissingCallback() {
-    YARP_ERROR(Logger::get(), "Missing or incorrectly typed onRead function");
+    yErrorNoFw("Missing or incorrectly typed onRead function");
 }
 
 

@@ -142,7 +142,7 @@ public:
                 pause *= 2;
             } while (isWriting() && (Time::now()-start<3));
             if (isWriting()) {
-                YARP_ERROR(Logger::get(), "Closing port that was sending data (slowly)");
+                yErrorNoFw("Closing port that was sending data (slowly)");
             }
         }
     }
@@ -308,8 +308,7 @@ public:
 
     void configWaitAfterSend(bool waitAfterSend) {
         if (waitAfterSend&&isManual()) {
-            YARP_ERROR(Logger::get(),
-                       "Cannot use background-mode writes on a fake port");
+            yErrorNoFw("Cannot use background-mode writes on a fake port");
         }
         recWaitAfterSend = waitAfterSend?1:0;
         setWaitAfterSend(waitAfterSend);
@@ -393,7 +392,7 @@ bool Port::open(const Contact& contact, bool registerName,
     Contact contact2 = contact;
 
     if (!NetworkBase::initialized()) {
-        YARP_ERROR(Logger::get(), "YARP not initialized; create a yarp::os::Network object before using ports");
+        yErrorNoFw("YARP not initialized; create a yarp::os::Network object before using ports");
         return false;
     }
 
@@ -634,15 +633,11 @@ bool Port::open(const Contact& contact, bool registerName,
     }
 
     if (!success) {
-        YARP_ERROR(Logger::get(),
-                   String("Port ") +
-                   (address.isValid()?(address.getRegName().c_str()):(contact2.getName().c_str())) +
-                   " failed to activate" +
-                   (address.isValid()?" at ":"") +
-                   (address.isValid()?address.toURI():String("")) +
-                   " (" +
-                   blame.c_str() +
-                   ")");
+        yErrorNoFw("Port %s failed to activate%s%s (%s)",
+                   (address.isValid() ? (address.getRegName().c_str()) : (contact2.getName().c_str())),
+                   (address.isValid() ? " at " : ""),
+                   (address.isValid() ? address.toURI().c_str() : ""),
+                   blame.c_str());
     }
 
     if (success) {
@@ -807,7 +802,7 @@ bool Port::replyAndDrop(PortWriter& writer) {
  * set an external writer for port data
  */
 //void Port::setWriter(PortWriter& writer) {
-//  YARP_ERROR(Logger::get(),"Port::setWriter not implemented");
+//  yErrorNoFw("Port::setWriter not implemented");
 //}
 
 void Port::setReader(PortReader& reader) {

@@ -196,7 +196,7 @@ bool yarp::os::impl::LocalCarrier::becomeLocal(ConnectionState& proto, bool send
         stream->attach(this,sender);
     }
     proto.takeStreams(stream);
-    //YARP_ERROR(Logger::get(),"*** don't trust local carrier yet ****");
+    //yErrorNoFw("*** don't trust local carrier yet ****");
     //ACE_OS::exit(1);
     return true;
 }
@@ -209,13 +209,11 @@ bool yarp::os::impl::LocalCarrier::write(ConnectionState& proto, SizedWriter& wr
         if (peer!=NULL) {
             peer->accept(ref);
         } else {
-            YARP_ERROR(Logger::get(),
-                        "local send failed - write without peer");
+            yErrorNoFw("local send failed - write without peer");
         }
         peerMutex.post();
     } else {
-        YARP_ERROR(Logger::get(),
-                    "local send failed - no object");
+        yErrorNoFw("local send failed - no object");
     }
 
     return true;

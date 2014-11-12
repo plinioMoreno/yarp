@@ -103,7 +103,7 @@ void SocketTwoWayStream::updateAddresses() {
         localAddress = Contact(inet_ntoa(ipv4local->sin_addr),ntohs(ipv4local->sin_port));
         remoteAddress = Contact(inet_ntoa(ipv4remote->sin_addr),ntohs(ipv4remote->sin_port));
     } else {
-        YARP_ERROR(Logger::get(),"ipv6 address type not propagated without ACE");
+        yErrorNoFw("ipv6 address type not propagated without ACE");
     }
 #endif
 }

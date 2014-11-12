@@ -805,7 +805,7 @@ bool NetworkBase::write(const Contact& contact,
     }
     if (!ok) {
         if (!style.quiet) {
-            YARP_ERROR(Logger::get(),"could not write to connection");
+            yErrorNoFw("could not write to connection");
         }
         if (out!=NULL) delete out;
         return false;
@@ -813,7 +813,7 @@ bool NetworkBase::write(const Contact& contact,
     ok = cmd.write(bw);
     if (!ok) {
         if (!style.quiet) {
-            YARP_ERROR(Logger::get(),"could not write to connection");
+            yErrorNoFw("could not write to connection");
         }
         if (out!=NULL) delete out;
         return false;
@@ -1202,7 +1202,7 @@ bool NetworkBase::registerCarrier(const char *name,const char *dll) {
         factory = new StubCarrier(dll,name);
     }
     if (factory==NULL) {
-        YARP_ERROR(Logger::get(),"Failed to register carrier");
+        yErrorNoFw("Failed to register carrier");
         return false;
     }
     if (!factory->isValid()) {

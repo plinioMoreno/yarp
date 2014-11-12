@@ -356,7 +356,7 @@ void *PortCoreOutputUnit::send(yarp::os::PortWriter& writer,
     }
 
     if ((!waitBefore)&&waitAfter) {
-        YARP_ERROR(Logger::get(), "chosen port wait combination not yet implemented");
+        yErrorNoFw("chosen port wait combination not yet implemented");
     }
     if (!sending) {
         cachedWriter = &writer;

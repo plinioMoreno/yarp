@@ -262,8 +262,7 @@ void PortCoreInputUnit::run() {
                         }
                     }
                     if (env.length()>2) {
-                        //YARP_ERROR(Logger::get(),
-                        //"***** received an envelope! [%s]", env.c_str());
+                        //yErrorNoFw("***** received an envelope! [%s]", env.c_str());
                         String env2 = env.substr(2,env.length());
                         man.setEnvelope(env2);
                         ip->setEnvelope(env2);

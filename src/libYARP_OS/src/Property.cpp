@@ -422,8 +422,7 @@ public:
         }
 
         if (!ok) {
-            YARP_ERROR(Logger::get(),String("cannot read from ") +
-                       fname);
+            yErrorNoFw("cannot read from %s", fname.c_str());
             return false;
         }
 
@@ -545,8 +544,7 @@ public:
                                                 target->addString(subName.c_str());
                                             }
                                         } else {
-                                            YARP_ERROR(Logger::get(),
-                                                       String("bad include"));
+                                            yErrorNoFw("bad include");
                                             return;
                                         }
 

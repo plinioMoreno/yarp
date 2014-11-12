@@ -118,7 +118,7 @@ Contact NameServer::registerName(const String& name,
     if (machine == "...") {
         if (carrier!="mcast") {
             if (remote=="...") {
-                YARP_ERROR(Logger::get(),"remote machine name was not found!  can only guess it is local...");
+                yErrorNoFw("remote machine name was not found!  can only guess it is local...");
                 machine = "127.0.0.1";
             } else {
                 machine = remote;
@@ -889,9 +889,8 @@ int NameServer::main(int argc, char *argv[]) {
     }
     else if (bNoAuto)
     {
-        YARP_ERROR(Logger::get(), String("Could not find configuration file ") +
-        conf.getConfigFileName());
-
+        yErrorNoFw("Could not find configuration file %s",
+                   conf.getConfigFileName().c_str());
         return 1;
     }
 
@@ -923,8 +922,8 @@ int NameServer::main(int argc, char *argv[]) {
     // and save
     conf.setAddress(suggest);
     if (!conf.toFile()) {
-        YARP_ERROR(Logger::get(), String("Could not save configuration file ") +
-                   conf.getConfigFileName());
+        yErrorNoFw("Could not save configuration file %s",
+                   conf.getConfigFileName().c_str());
     }
 
     MainNameServer name(suggest.getPort() + 2);
@@ -966,12 +965,10 @@ int NameServer::main(int argc, char *argv[]) {
     }
 
     if (!ok) {
-        YARP_ERROR(Logger::get(), "Name server failed to start");
-        //YARP_ERROR(Logger::get(), String("   reason for failure is \"") +
-        //e.toString() + "\"");
-        YARP_ERROR(Logger::get(), "Maybe it is already be running?");
+        yErrorNoFw("Name server failed to start");
+        yErrorNoFw("Maybe it is already be running?");
         if (suggest.getPort()>0) {
-            YARP_ERROR(Logger::get(), String("Or perhaps another service may already be running on port ") + NetType::toString(suggest.getPort()) + "?");
+            yErrorNoFw("Or perhaps another service may already be running on port %d?", suggest.getPort());
         }
         return 1;
     }

@@ -24,7 +24,7 @@ ElectionOf<PeerRecord<McastCarrier> >& McastCarrier::getCaster() {
         caster = new ElectionOf<PeerRecord<McastCarrier> >;
         NetworkBase::unlock();
         if (caster==NULL) {
-            YARP_ERROR(Logger::get(), "No memory for McastCarrier::caster");
+            yErrorNoFw("No memory for McastCarrier::caster");
             exit(1);
         }
     } else {
@@ -113,8 +113,8 @@ bool yarp::os::impl::McastCarrier::sendHeader(ConnectionState& proto) {
     }
 
     if (!addr.isValid()) {
-        YARP_ERROR(Logger::get(), "Name server not responding helpfully, setting mcast name arbitrarily.");
-        YARP_ERROR(Logger::get(), "Only a single mcast address supported in this mode.");
+        yErrorNoFw("Name server not responding helpfully, setting mcast name arbitrarily.");
+        yErrorNoFw("Only a single mcast address supported in this mode.");
         addr = Contact::bySocket("mcast","224.3.1.1",11000).addName("/tmp/mcast");
     }
 
@@ -134,7 +134,7 @@ bool yarp::os::impl::McastCarrier::expectExtraHeader(ConnectionState& proto) {
     ManagedBytes block(6);
     YARP_SSIZE_T len = proto.is().readFull(block.bytes());
     if ((size_t)len!=block.length()) {
-        YARP_ERROR(Logger::get(),"problem with MCAST header");
+        yErrorNoFw("problem with MCAST header");
         return false;
     }
 

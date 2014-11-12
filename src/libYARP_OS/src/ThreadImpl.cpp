@@ -81,10 +81,6 @@ static unsigned __stdcall theExecutiveBranch (void *args)
         thread->threadRelease();
     }
 
-
-    //YARP_ERROR(Logger::get(),String("uncaught exception in thread: ") +
-    //             e.toString());
-
     ThreadImpl::changeCount(-1);
     YARP_DEBUG(Logger::get(),"Thread shutting down");
     //ACE_Thread::exit();
@@ -149,7 +145,7 @@ int ThreadImpl::join(double seconds) {
         if (seconds>0) {
             if (!initWasSuccessful) {
                 // join called before start completed
-                YARP_ERROR(Logger::get(),String("Tried to join a thread before starting it"));
+                yErrorNoFw("Tried to join a thread before starting it");
                 return -1;
             }
             synchro.waitWithTimeout(seconds);
@@ -278,9 +274,7 @@ bool ThreadImpl::start() {
         }
     }
     //the thread did not start, call afterStart() to warn the user
-    char tmp[80];
-    sprintf(tmp, "%d", result);
-    YARP_ERROR(Logger::get(),String("A thread failed to start with error code: ")+String(tmp));
+    yErrorNoFw("A thread failed to start with error code: %d", result);
     afterStart(false);
     return false;
 }
@@ -331,7 +325,7 @@ int ThreadImpl::setPriority(int priority, int policy) {
     if (active && priority!=-1) {
 
 #if defined(YARP_HAS_CXX11)
-        YARP_ERROR(Logger::get(),"Cannot set priority with C++11");
+        yErrorNoFw("Cannot set priority with C++11");
 #else
     #if defined(YARP_HAS_ACE) // Use ACE API
         return ACE_Thread::setprio(hid, priority, policy);
@@ -341,7 +335,7 @@ int ThreadImpl::setPriority(int priority, int policy) {
         int ret pthread_setschedparam(hid, policy, &thread_param);
         return (ret != 0) ? -1 : 0;
     #else
-        YARP_ERROR(Logger::get(),"Cannot set priority without ACE");
+        yErrorNoFw("Cannot set priority without ACE");
     #endif
 #endif
     }
@@ -352,7 +346,7 @@ int ThreadImpl::getPriority() {
     int prio = defaultPriority;
     if (active) {
 #if defined(YARP_HAS_CXX11)
-        YARP_ERROR(Logger::get(),"Cannot get priority with C++11");
+        yErrorNoFw("Cannot get priority with C++11");
 #else
     #if defined(YARP_HAS_ACE) // Use ACE API
         ACE_Thread::getprio(hid, prio);
@@ -362,7 +356,7 @@ int ThreadImpl::getPriority() {
         if(pthread_getschedparam(hid, &policy, &thread_param) == 0)
             prio = thread_param.priority;
     #else
-        YARP_ERROR(Logger::get(),"Cannot read priority without ACE");
+        yErrorNoFw("Cannot read priority without ACE");
     #endif
 #endif
     }
@@ -373,7 +367,7 @@ int ThreadImpl::getPolicy() {
     int policy = defaultPolicy;
     if (active) {
 #if defined(YARP_HAS_CXX11)
-        YARP_ERROR(Logger::get(),"Cannot get scheduiling policy with C++11");
+        yErrorNoFw("Cannot get scheduiling policy with C++11");
 #else
     #if defined(YARP_HAS_ACE) // Use ACE API
         int prio;
@@ -383,7 +377,7 @@ int ThreadImpl::getPolicy() {
         if(pthread_getschedparam(hid, &policy, &thread_param) != 0)
             policy = defaultPolicy;
     #else
-        YARP_ERROR(Logger::get(),"Cannot read scheduling policy without ACE");
+        yErrorNoFw("Cannot read scheduling policy without ACE");
     #endif
 #endif
     }

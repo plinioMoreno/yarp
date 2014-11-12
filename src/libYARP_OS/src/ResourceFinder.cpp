@@ -41,7 +41,7 @@ static ConstString expandUserFileName(const ConstString& fname) {
     } else if (home!="") {
         conf = home + "/.yarp/" + fname;
     } else {
-        YARP_ERROR(Logger::get(),"Cannot read configuration - please set YARP_CONF or HOME or HOMEPATH");
+        yErrorNoFw("Cannot read configuration - please set YARP_CONF or HOME or HOMEPATH");
         ACE_OS::exit(1);
     }
     YARP_DEBUG(Logger::get(),(ConstString("Configuration file: ") + conf).c_str());

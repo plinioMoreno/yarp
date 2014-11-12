@@ -39,14 +39,14 @@ public:
         if (result!=-1) return;
         int ct = 100;
         while (result == -1 && ct>=0) {
-            YARP_ERROR(Logger::get(), yarp::os::impl::String("semaphore wait failed (errno ") + (yarp::os::NetType::toString(ACE_OS::last_error())) + yarp::os::impl::String("); gdb problem, or bad YARP+ACE flags"));
+            yErrorNoFw("semaphore wait failed (errno %d); gdb problem, or bad YARP+ACE flags"), ACE_OS::last_error());
             result = sema.acquire();
             ct--;
         }
         if (result==-1) {
-            YARP_ERROR(Logger::get(), "semaphore wait failed");
+            yErrorNoFw("semaphore wait failed");
         } else {
-            YARP_ERROR(Logger::get(), "semaphore wait eventually succeeded");
+            yErrorNoFw("semaphore wait eventually succeeded");
         }
     }
 

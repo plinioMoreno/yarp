@@ -150,7 +150,7 @@ bool DgramTwoWayStream::open(const Contact& local, const Contact& remote) {
 #endif
 
     if (result!=0) {
-        YARP_ERROR(Logger::get(),"could not open datagram socket");
+        yErrorNoFw("could not open datagram socket");
         return false;
     }
 
@@ -341,7 +341,7 @@ bool DgramTwoWayStream::openMcast(const Contact& group,
     }
 
     if (result!=0) {
-        YARP_ERROR(Logger::get(),"could not open multicast datagram socket");
+        yErrorNoFw("could not open multicast datagram socket");
         return false;
     }
 
@@ -404,7 +404,7 @@ bool DgramTwoWayStream::join(const Contact& group, bool sender,
     configureSystemBuffers();
 
     if (result!=0) {
-        YARP_ERROR(Logger::get(),"cannot connect to multi-cast address");
+        yErrorNoFw("cannot connect to multi-cast address");
         happy = false;
         return false;
     }
@@ -590,9 +590,7 @@ YARP_SSIZE_T DgramTwoWayStream::read(const Bytes& b) {
             /*
               // this message isn't needed anymore
             if (result>WRITE_SIZE*1.25) {
-                YARP_ERROR(Logger::get(),
-                           String("Got big datagram: ")+NetType::toString(result)+
-                           " bytes");
+                yErrorNoFw("Got big datagram: %d bytes", result);
             }
             */
             if (closed||(result<0)) {
@@ -609,8 +607,7 @@ YARP_SSIZE_T DgramTwoWayStream::read(const Bytes& b) {
                 pct++;
                 if (!crcOk) {
                     if (bufferAlertNeeded&&!bufferAlerted) {
-                        YARP_ERROR(Logger::get(),
-                                   "*** Multicast/UDP packet dropped - checksum error ***");
+                        yErrorNoFw("*** Multicast/UDP packet dropped - checksum error ***");
                         YARP_INFO(Logger::get(),
                                   "The UDP/MCAST system buffer limit on your system is low.");
                         YARP_INFO(Logger::get(),
@@ -629,8 +626,7 @@ YARP_SSIZE_T DgramTwoWayStream::read(const Bytes& b) {
                         errCount++;
                         double now = Time::now();
                         if (now-lastReportTime>1) {
-                            YARP_ERROR(Logger::get(),
-                                       String("*** ") + NetType::toString(errCount) + " datagram packet(s) dropped - checksum error ***");
+                            yErrorNoFw("*** %d datagram packet(s) dropped - checksum error ***", errCount);
                             lastReportTime = now;
                             errCount = 0;
                         }
@@ -799,12 +795,12 @@ void DgramTwoWayStream::reset() {
 
 
 void DgramTwoWayStream::beginPacket() {
-    //YARP_ERROR(Logger::get(),String("Packet begins: ")+(reader?"reader":"writer"));
+    //yErrorNoFw("Packet begins: %s", reader?"reader":"writer");
     pct = 0;
 }
 
 void DgramTwoWayStream::endPacket() {
-    //YARP_ERROR(Logger::get(),String("Packet ends: ")+(reader?"reader":"writer"));
+    //yErrorNoFw("Packet ends: %s", reader?"reader":"writer");
     if (!reader) {
         pct = 0;
     }

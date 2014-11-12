@@ -32,7 +32,7 @@ bool ShmemOutputStreamImpl::open(int port,int size)
 
     if (ACE::get_temp_dir(temp_dir_path,1024)==-1)
     {
-        YARP_ERROR(Logger::get(),"ShmemHybridStream: no temp directory found.");
+        yErrorNoFw("ShmemHybridStream: no temp directory found.");
         return false;
     }
 
@@ -104,7 +104,7 @@ bool ShmemOutputStreamImpl::Resize(int newsize)
 
     if (ACE::get_temp_dir(file_path,1024)==-1)
     {
-        YARP_ERROR(Logger::get(),"ShmemHybridStream: no temp directory found.");
+        yErrorNoFw("ShmemHybridStream: no temp directory found.");
         return false;
     }
 
@@ -128,7 +128,7 @@ bool ShmemOutputStreamImpl::Resize(int newsize)
 
     if (!pNewMap)
     {
-        YARP_ERROR(Logger::get(),String("ShmemOutputStream can't create shared memory"));
+        yErrorNoFw("ShmemOutputStream can't create shared memory");
         return false;
     }
 

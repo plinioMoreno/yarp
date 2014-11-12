@@ -68,12 +68,12 @@ void TcpFace::closeFace() {
 }
 
 static void showError(Logger& log) {
-    YARP_ERROR(log,"Authentication failed.");
-    YARP_ERROR(log,"Authentication was enabled with the USE_PORT_AUTHENTICATION");
-    YARP_ERROR(log,"flag when YARP was configured. If you do not want to set up");
-    YARP_ERROR(log,"authentication, please return this flag to its default value.");
-    YARP_ERROR(log,"If you do want to set up authentication, check:");
-    YARP_ERROR(log,"  http://wiki.icub.org/yarpdoc/yarp_port_auth.html");
+    yErrorNoFw("Authentication failed.");
+    yErrorNoFw("Authentication was enabled with the USE_PORT_AUTHENTICATION");
+    yErrorNoFw("flag when YARP was configured. If you do not want to set up");
+    yErrorNoFw("authentication, please return this flag to its default value.");
+    yErrorNoFw("If you do want to set up authentication, check:");
+    yErrorNoFw("  http://wiki.icub.org/yarpdoc/yarp_port_auth.html");
 }
 
 /**

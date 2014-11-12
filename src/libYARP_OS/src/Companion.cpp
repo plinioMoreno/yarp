@@ -522,7 +522,7 @@ int Companion::ping(const char *port, bool quiet) {
     Contact address = NetworkBase::queryName(port);
     if (!address.isValid()) {
         if (!quiet) {
-            YARP_ERROR(Logger::get(),"could not find port");
+            yErrorNoFw("could not find port");
         }
         return 1;
     }
@@ -530,13 +530,13 @@ int Companion::ping(const char *port, bool quiet) {
     if (address.getCarrier()=="tcp") {
         out = Carriers::connect(address);
         if (out==NULL) {
-            YARP_ERROR(Logger::get(),"port found, but cannot connect");
+            yErrorNoFw("port found, but cannot connect");
             return 1;
         }
         Route r(connectionName,port,"text_ack");
         bool ok = out->open(r);
         if (!ok) {
-            YARP_ERROR(Logger::get(),"could not connect to port");
+            yErrorNoFw("could not connect to port");
             return 1;
         }
         OutputStream& os = out->getOutputStream();
@@ -1655,7 +1655,7 @@ int Companion::cmdDetect(int argc, char *argv[]) {
         } else if (String(argv[0])=="--ros") {
             ros = true;
         } else {
-            YARP_ERROR(Logger::get(), "Argument not understood");
+            yErrorNoFw("Argument not understood");
             return 1;
         }
     }
@@ -1890,7 +1890,7 @@ public:
             companion_active_port = &core;
             address = core.where();
         } else {
-            //YARP_ERROR(Logger::get(),"Could not create port");
+            //yErrorNoFw("Could not create port");
             done.post();
         }
     }
@@ -2207,7 +2207,7 @@ int Companion::rpc(const char *connectionName, const char *targetName) {
         port.openFake(connectionName);
         if (!port.addOutput(targetName)) {
             ACE_OS::fprintf(stderr, "Cannot make connection\n");
-            YARP_ERROR(Logger::get(),"Alternative method: precede port name with --client");
+            yErrorNoFw("Alternative method: precede port name with --client");
             return 1;
         }
         if (adminMode) {

@@ -28,7 +28,7 @@ void FallbackNameClient::run() {
     send.join(call,true);
     listen.join(call,false);
     if (!listen.isOk()) {
-        YARP_ERROR(Logger::get(),String("Multicast not available"));
+        yErrorNoFw("Multicast not available");
         return;
     }
     String msg = String("NAME_SERVER query ") + nc.getNamespace();

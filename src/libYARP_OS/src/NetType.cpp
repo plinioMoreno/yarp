@@ -26,7 +26,7 @@ bool NetType::netInt(int data, const yarp::os::Bytes& code) {
     NetInt32 i = data;
     yarp::os::Bytes b((char*)(&i),sizeof(i));
     if (code.length()!=sizeof(i)) {
-        YARP_ERROR(Logger::get(),"not enough room for integer");
+        yErrorNoFw("not enough room for integer");
         return false;
     }
     ACE_OS::memcpy(code.get(),b.get(),code.length());

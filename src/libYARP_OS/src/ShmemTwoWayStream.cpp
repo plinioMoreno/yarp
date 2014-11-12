@@ -44,17 +44,17 @@ int ShmemTwoWayStream::open(const Address& address, bool sender) {
             YARP_DEBUG(Logger::get(),"shmem sender connect succeeded");
             happy = true;
         } else {
-            YARP_ERROR(Logger::get(),"*** Shared memory connection failed");
+            yErrorNoFw("*** Shared memory connection failed");
             // perror doesn't seem to get set in any useful way, omit it
             // perror("send connect");
-            YARP_ERROR(Logger::get(),"Shared memory connections can fail due to a network configuration problem.");
-            YARP_ERROR(Logger::get(),"There is a check to make sure shared memory connections are local,");
-            YARP_ERROR(Logger::get(),"and this check relies on your hostname being configured well.");
-            YARP_ERROR(Logger::get(),"Possible fixes:");
-            YARP_ERROR(Logger::get(),"   - On linux, edit /etc/hosts to link 127.0.0.1 with your hostname");
-            YARP_ERROR(Logger::get(),"   - (you can find out your hostname with the \"hostname\" command)");
-            YARP_ERROR(Logger::get(),"   - On a windows laptop, make sure you have a network card attached");
-            YARP_ERROR(Logger::get(),"For up to date information, see mailing list linked on yarp0.sf.net");
+            yErrorNoFw("Shared memory connections can fail due to a network configuration problem.");
+            yErrorNoFw("There is a check to make sure shared memory connections are local,");
+            yErrorNoFw("and this check relies on your hostname being configured well.");
+            yErrorNoFw("Possible fixes:");
+            yErrorNoFw("   - On linux, edit /etc/hosts to link 127.0.0.1 with your hostname");
+            yErrorNoFw("   - (you can find out your hostname with the \"hostname\" command)");
+            yErrorNoFw("   - On a windows laptop, make sure you have a network card attached");
+            yErrorNoFw("For up to date information, see mailing list linked on yarp0.sf.net");
         }
         currentLength = INIT_SHMEM_BUFFER;
         updateAddresses();
@@ -70,7 +70,7 @@ int ShmemTwoWayStream::open(const Address& address, bool sender) {
         if (result>=0) {
             YARP_DEBUG(Logger::get(),"shmem receiver open succeeded");
         } else {
-            YARP_ERROR(Logger::get(),"shmem receiver open failed");
+            yErrorNoFw("shmem receiver open failed");
             perror("recv open");
         }
         return result;
@@ -92,7 +92,7 @@ int ShmemTwoWayStream::accept() {
         YARP_DEBUG(Logger::get(),"shmem receiver accept succeeded");
         happy = true;
     } else {
-        YARP_ERROR(Logger::get(),"shmem receiver accept failed");
+        yErrorNoFw("shmem receiver accept failed");
         perror("recv accept");
     }
     updateAddresses();
@@ -128,7 +128,7 @@ int ShmemTwoWayStream::read(const Bytes& b) {
             happy = false;
             YARP_DEBUG(Logger::get(),"bad socket read");
             total = -1;
-            YARP_ERROR(Logger::get(),"shmem read failed");
+            yErrorNoFw("shmem read failed");
             return -1;
         }
         remaining -= len;
@@ -145,15 +145,14 @@ void ShmemTwoWayStream::write(const Bytes& b) {
     while (remaining>0) {
         int len = remaining;
         if (len>INIT_SHMEM_BUFFER) {
-            YARP_ERROR(Logger::get(),
-                       "shmem writing a long packet, may be unreliable");
+            yErrorNoFw("shmem writing a long packet, may be unreliable");
             len = INIT_SHMEM_BUFFER;
         }
         int result = stream.send_n(base,len);
         if (result<0) {
             happy = false;
             YARP_DEBUG(Logger::get(),"bad socket write");
-            YARP_ERROR(Logger::get(),"shmem write failed");
+            yErrorNoFw("shmem write failed");
             return;
         }
         remaining -= len;

@@ -118,9 +118,7 @@ protected:
 
         if (ret<=0)
         {
-            YARP_ERROR(Logger::get(),
-                       String("ShmemHybridStream socket writing error ")
-                       +NetType::toString(ret));
+            yErrorNoFw("ShmemHybridStream socket writing error %d", ret);
             Close();
         }
 
