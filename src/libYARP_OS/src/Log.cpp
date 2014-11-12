@@ -34,15 +34,15 @@
 
 #ifndef WIN32
 
- #define RED     (colored_output ? "\033[01;31m" : "")
- #define GREEN   (colored_output ? "\033[01;32m" : "")
- #define YELLOW  (colored_output ? "\033[01;33m" : "")
- #define BLUE    (colored_output ? "\033[01;34m" : "")
- #define MAGENTA (colored_output ? "\033[01;35m" : "")
- #define CYAN    (colored_output ? "\033[01;36m" : "")
- #define WHITE   (colored_output ? "\033[01;37m" : "")
- #define RED_BG  (colored_output ? "\033[01;41m" : "")
- #define CLEAR   (colored_output ? "\033[00m" : "")
+ #define RED     (yarp::os::impl::LogImpl::colored_output ? "\033[01;31m" : "")
+ #define GREEN   (yarp::os::impl::LogImpl::colored_output ? "\033[01;32m" : "")
+ #define YELLOW  (yarp::os::impl::LogImpl::colored_output ? "\033[01;33m" : "")
+ #define BLUE    (yarp::os::impl::LogImpl::colored_output ? "\033[01;34m" : "")
+ #define MAGENTA (yarp::os::impl::LogImpl::colored_output ? "\033[01;35m" : "")
+ #define CYAN    (yarp::os::impl::LogImpl::colored_output ? "\033[01;36m" : "")
+ #define WHITE   (yarp::os::impl::LogImpl::colored_output ? "\033[01;37m" : "")
+ #define RED_BG  (yarp::os::impl::LogImpl::colored_output ? "\033[01;41m" : "")
+ #define CLEAR   (yarp::os::impl::LogImpl::colored_output ? "\033[00m" : "")
 
 #else // WIN32
 
