@@ -59,11 +59,35 @@
 
 #endif // WIN32
 
-bool yarp::os::impl::LogImpl::colored_output(getenv("YARP_COLORED_OUTPUT")     &&  (strcmp(yarp::os::getenv("YARP_COLORED_OUTPUT"), "1") == 0));
-bool yarp::os::impl::LogImpl::verbose_output(getenv("YARP_VERBOSE_OUTPUT")     &&  (strcmp(yarp::os::getenv("YARP_VERBOSE_OUTPUT"), "1") == 0));
-bool yarp::os::impl::LogImpl::trace_output  (getenv("YARP_TRACE_ENABLE")       &&  (strcmp(yarp::os::getenv("YARP_TRACE_ENABLE"), "1") == 0));
-bool yarp::os::impl::LogImpl::debug_output  (!getenv("YARP_DEBUG_ENABLE")      || !(strcmp(yarp::os::getenv("YARP_DEBUG_ENABLE"), "0") == 0));
-bool yarp::os::impl::LogImpl::forward_output(getenv("YARP_FORWARD_LOG_ENABLE") &&  (strcmp(yarp::os::getenv("YARP_FORWARD_LOG_ENABLE"), "1") == 0));
+static bool from_env(const char* name, bool defaultvalue) {
+    const char *strvalue = yarp::os::getenv(name);
+
+    if(!strvalue) return defaultvalue;
+
+    if(strcmp(strvalue, "1") == 0) return true;
+    if(strcmp(strvalue, "true") == 0) return true;
+    if(strcmp(strvalue, "True") == 0) return true;
+    if(strcmp(strvalue, "TRUE") == 0) return true;
+    if(strcmp(strvalue, "on") == 0) return true;
+    if(strcmp(strvalue, "On") == 0) return true;
+    if(strcmp(strvalue, "ON") == 0) return true;
+
+    if(strcmp(strvalue, "0") == 0) return false;
+    if(strcmp(strvalue, "false") == 0) return false;
+    if(strcmp(strvalue, "False") == 0) return false;
+    if(strcmp(strvalue, "FALSE") == 0) return false;
+    if(strcmp(strvalue, "off") == 0) return false;
+    if(strcmp(strvalue, "Off") == 0) return false;
+    if(strcmp(strvalue, "OFF") == 0) return false;
+
+    return defaultvalue;
+}
+
+bool yarp::os::impl::LogImpl::colored_output(from_env("YARP_COLORED_OUTPUT", false));
+bool yarp::os::impl::LogImpl::verbose_output(from_env("YARP_VERBOSE_OUTPUT", false));
+bool yarp::os::impl::LogImpl::debug_output(from_env("YARP_DEBUG_ENABLE", true));
+bool yarp::os::impl::LogImpl::trace_output(from_env("YARP_TRACE_ENABLE", false) && yarp::os::impl::LogImpl::debug_output);
+bool yarp::os::impl::LogImpl::forward_output(from_env("YARP_FORWARD_LOG_ENABLE", false));
 
 yarp::os::Log::LogCallback yarp::os::Log::print_callback = yarp::os::impl::LogImpl::print_callback;
 yarp::os::Log::LogCallback yarp::os::Log::forward_callback = yarp::os::impl::LogImpl::forward_callback;
