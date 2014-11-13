@@ -28,12 +28,13 @@ namespace os {
 
 class YARP_OS_API LogStream {
     struct Stream {
-        Stream(Log::LogType t, const char *fn, unsigned int l, const char *f) : type(t), file(fn), line(l), func(f), fw(true), ref(1) {}
+        Stream(Log::LogType t, const char *fn, unsigned int l, const char *f, const char *c) : type(t), file(fn), line(l), func(f), comp(c), fw(true), ref(1) {}
                std::ostringstream oss;
                Log::LogType type;
                const char *file;
                unsigned int line;
                const char *func;
+               const char *comp;
                bool fw;
                int ref;
     } *stream;
@@ -42,8 +43,9 @@ public:
     inline LogStream(Log::LogType type,
                      const char *file,
                      unsigned int line,
-                     const char *func) :
-        stream(new Stream(type, file, line, func))
+                     const char *func,
+                     const char *comp = NULL) :
+        stream(new Stream(type, file, line, func, comp))
     {
     }
 
@@ -54,10 +56,10 @@ public:
     inline ~LogStream() {
         if (!--stream->ref) {
             if (Log::print_callback) {
-                Log::print_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func);
+                Log::print_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func, stream->comp);
             }
             if (stream->fw && Log::forward_callback) {
-                Log::forward_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func);
+                Log::forward_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func, stream->comp);
             }
             if (stream->type == yarp::os::Log::FatalType) {
                 yarp_print_trace(stderr, stream->file, stream->line);

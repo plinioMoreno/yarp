@@ -99,10 +99,12 @@ yarp::os::Log::LogCallback yarp::os::Log::forward_callback = yarp::os::impl::Log
 
 yarp::os::impl::LogImpl::LogImpl(const char *file,
                                  unsigned int line,
-                                 const char *func) :
+                                 const char *func,
+                                 const char *comp) :
         file(file),
         line(line),
-        func(func)
+        func(func),
+        comp(comp)
 {
 }
 
@@ -112,7 +114,8 @@ void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
                                              const char *msg,
                                              const char *file,
                                              const unsigned int line,
-                                             const char *func)
+                                             const char *func,
+                                             const char *comp)
 {
     if (t == yarp::os::Log::TraceType && !trace_output) {
         return;
@@ -169,18 +172,25 @@ void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
     if (verbose_output) {
         *ost << file << ":" << line << " " << color << bgcolor << func << CLEAR;
         *ost << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
-        *ost << (msg[0] ? ": " : "");
+        *ost << (msg[0] || comp ? ": " : "");
     } else if (t == yarp::os::Log::TraceType) {
-        *ost << WHITE << func << CLEAR << (msg[0] ? ": " : "");
+        *ost << WHITE << func << CLEAR << (msg[0] || comp ? ": " : "");
     }
-    *ost << msg << std::endl;
+    if (comp) {
+        *ost << "[" << comp << "] ";
+    }
+    if (msg[0]) {
+        *ost << msg;
+    }
+    *ost << std::endl;
 }
 
 void yarp::os::impl::LogImpl::forward_callback(yarp::os::Log::LogType t,
                                                const char *msg,
                                                const char *file,
                                                const unsigned int line,
-                                               const char *func)
+                                               const char *func,
+                                               const char *comp)
 {
     if (!forward_output) {
         return;
@@ -225,24 +235,32 @@ void yarp::os::impl::LogImpl::forward_callback(yarp::os::Log::LogType t,
     if (verbose_output) {
         stringstream_buffer << file << ":" << line << " " << func;
         stringstream_buffer << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
-        stringstream_buffer << (msg[0] ? ": " : "");
-    } else if (t == yarp::os::Log::TraceType) {
-        stringstream_buffer << func << (msg[0] ? ": " : "");
+        stringstream_buffer << (msg[0] || comp ? ": " : "");
     }
-    stringstream_buffer << msg << std::endl;
+    if (comp) {
+        stringstream_buffer << "[component=" << comp << "]";
+    }
+    if (!verbose_output && t == yarp::os::Log::TraceType) {
+        stringstream_buffer << func << (msg[0] || comp ? ": " : "");
+    }
+    if (msg[0]) {
+        stringstream_buffer << msg;
+    }
+    stringstream_buffer << std::endl;
 
     theForwarder->forward(stringstream_buffer.str());
 }
 
 yarp::os::Log::Log(const char *file,
                    unsigned int line,
-                   const char *func) :
-        mPriv(new yarp::os::impl::LogImpl(file, line, func))
+                   const char *func,
+                   const char *comp) :
+        mPriv(new yarp::os::impl::LogImpl(file, line, func, comp))
 {
 }
 
 yarp::os::Log::Log() :
-        mPriv(new yarp::os::impl::LogImpl(NULL, 0, NULL))
+        mPriv(new yarp::os::impl::LogImpl(NULL, 0, NULL, NULL))
 {
 }
 
@@ -262,10 +280,10 @@ inline void yarp::os::impl::LogImpl::log(yarp::os::Log::LogType type,
             buf[w-1]=0;
         }
         if (print_callback) {
-            print_callback(type, buf, file, line, func);
+            print_callback(type, buf, file, line, func, comp);
         }
         if (forward && forward_callback) {
-            forward_callback(type, buf, file, line, func);
+            forward_callback(type, buf, file, line, func, comp);
         }
     }
 }
@@ -288,12 +306,12 @@ void yarp::os::Log::nofw_trace(const char *msg, ...) const
 
 yarp::os::LogStream yarp::os::Log::trace() const
 {
-    return yarp::os::LogStream(yarp::os::Log::TraceType, mPriv->file, mPriv->line, mPriv->func);
+    return yarp::os::LogStream(yarp::os::Log::TraceType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp);
 }
 
 yarp::os::LogStream yarp::os::Log::nofw_trace() const
 {
-    return yarp::os::LogStream(yarp::os::Log::TraceType, mPriv->file, mPriv->line, mPriv->func).nofw();
+    return yarp::os::LogStream(yarp::os::Log::TraceType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp).nofw();
 }
 
 void yarp::os::Log::debug(const char *msg, ...) const
@@ -314,12 +332,12 @@ void yarp::os::Log::nofw_debug(const char *msg, ...) const
 
 yarp::os::LogStream yarp::os::Log::debug() const
 {
-    return yarp::os::LogStream(yarp::os::Log::DebugType, mPriv->file, mPriv->line, mPriv->func);
+    return yarp::os::LogStream(yarp::os::Log::DebugType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp);
 }
 
 yarp::os::LogStream yarp::os::Log::nofw_debug() const
 {
-    return yarp::os::LogStream(yarp::os::Log::DebugType, mPriv->file, mPriv->line, mPriv->func).nofw();
+    return yarp::os::LogStream(yarp::os::Log::DebugType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp).nofw();
 }
 
 
@@ -341,12 +359,12 @@ void yarp::os::Log::nofw_info(const char *msg, ...) const
 
 yarp::os::LogStream yarp::os::Log::info() const
 {
-    return yarp::os::LogStream(yarp::os::Log::InfoType, mPriv->file, mPriv->line, mPriv->func);
+    return yarp::os::LogStream(yarp::os::Log::InfoType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp);
 }
 
 yarp::os::LogStream yarp::os::Log::nofw_info() const
 {
-    return yarp::os::LogStream(yarp::os::Log::InfoType, mPriv->file, mPriv->line, mPriv->func).nofw();
+    return yarp::os::LogStream(yarp::os::Log::InfoType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp).nofw();
 }
 
 
@@ -368,12 +386,12 @@ void yarp::os::Log::nofw_warning(const char *msg, ...) const
 
 yarp::os::LogStream yarp::os::Log::warning() const
 {
-    return yarp::os::LogStream(yarp::os::Log::WarningType, mPriv->file, mPriv->line, mPriv->func);
+    return yarp::os::LogStream(yarp::os::Log::WarningType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp);
 }
 
 yarp::os::LogStream yarp::os::Log::nofw_warning() const
 {
-    return yarp::os::LogStream(yarp::os::Log::WarningType, mPriv->file, mPriv->line, mPriv->func).nofw();
+    return yarp::os::LogStream(yarp::os::Log::WarningType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp).nofw();
 }
 
 
@@ -395,11 +413,11 @@ void yarp::os::Log::nofw_error(const char *msg, ...) const
 
 yarp::os::LogStream yarp::os::Log::error() const
 {
-    return yarp::os::LogStream(yarp::os::Log::ErrorType, mPriv->file, mPriv->line, mPriv->func);
+    return yarp::os::LogStream(yarp::os::Log::ErrorType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp);
 }
 yarp::os::LogStream yarp::os::Log::nofw_error() const
 {
-    return yarp::os::LogStream(yarp::os::Log::ErrorType, mPriv->file, mPriv->line, mPriv->func).nofw();
+    return yarp::os::LogStream(yarp::os::Log::ErrorType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp).nofw();
 }
 
 void yarp::os::Log::fatal(const char *msg, ...) const
@@ -424,12 +442,12 @@ void yarp::os::Log::nofw_fatal(const char *msg, ...) const
 
 yarp::os::LogStream yarp::os::Log::fatal() const
 {
-    return yarp::os::LogStream(yarp::os::Log::FatalType, mPriv->file, mPriv->line, mPriv->func);
+    return yarp::os::LogStream(yarp::os::Log::FatalType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp);
 }
 
 yarp::os::LogStream yarp::os::Log::nofw_fatal() const
 {
-    return yarp::os::LogStream(yarp::os::Log::FatalType, mPriv->file, mPriv->line, mPriv->func).nofw();
+    return yarp::os::LogStream(yarp::os::Log::FatalType, mPriv->file, mPriv->line, mPriv->func, mPriv->comp).nofw();
 }
 
 

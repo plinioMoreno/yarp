@@ -53,7 +53,8 @@ public:
 
     Log(const char *file,
         const unsigned int line,
-        const char *func);
+        const char *func,
+        const char *comp = NULL);
     Log();
     virtual ~Log();
 
@@ -106,6 +107,7 @@ public:
                                 const char *,
                                 const char *,
                                 const unsigned int,
+                                const char *,
                                 const char *);
 
     static void setLogCallback(LogCallback);
@@ -123,19 +125,33 @@ private:
 } // namespace yarp
 
 
-#define yTrace   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).trace
-#define yDebug   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).debug
-#define yInfo    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).info
-#define yWarning yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).warning
-#define yError   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).error
-#define yFatal   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).fatal
+#define yTrace(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).trace(__VA_ARGS__)
+#define yDebug(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).debug(__VA_ARGS__)
+#define yInfo(...)    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).info(__VA_ARGS__)
+#define yWarning(...) yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).warning(__VA_ARGS__)
+#define yError(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).error(__VA_ARGS__)
+#define yFatal(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).fatal(__VA_ARGS__)
 
-#define yTraceNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_trace
-#define yDebugNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_debug
-#define yInfoNoFw    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_info
-#define yWarningNoFw yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_warning
-#define yErrorNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_error
-#define yFatalNoFw   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_fatal
+#define yTraceNoFw(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_trace(__VA_ARGS__)
+#define yDebugNoFw(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_debug(__VA_ARGS__)
+#define yInfoNoFw(...)    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_info(__VA_ARGS__)
+#define yWarningNoFw(...) yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_warning(__VA_ARGS__)
+#define yErrorNoFw(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_error(__VA_ARGS__)
+#define yFatalNoFw(...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__).nofw_fatal(__VA_ARGS__)
+
+#define yCTrace(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).trace(__VA_ARGS__)
+#define yCDebug(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).debug(__VA_ARGS__)
+#define yCInfo(component, ...)    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).info(__VA_ARGS__)
+#define yCWarning(component, ...) yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).warning(__VA_ARGS__)
+#define yCError(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).error(__VA_ARGS__)
+#define yCFatal(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).fatal(__VA_ARGS__)
+
+#define yCTraceNoFw(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).nofw_trace(__VA_ARGS__)
+#define yCDebugNoFw(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).nofw_debug(__VA_ARGS__)
+#define yCInfoNoFw(component, ...)    yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).nofw_info(__VA_ARGS__)
+#define yCWarningNoFw(component, ...) yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).nofw_warning(__VA_ARGS__)
+#define yCErrorNoFw(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).nofw_error(__VA_ARGS__)
+#define yCFatalNoFw(component, ...)   yarp::os::Log(__FILE__, __LINE__, __YFUNCTION__, component).nofw_fatal(__VA_ARGS__)
 
 #define yAssert(x)  if (!(x)) { yFatal("Assertion failure (%s)", #x); }
 

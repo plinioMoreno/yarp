@@ -17,7 +17,8 @@ class yarp::os::impl::LogImpl
 public:
     LogImpl(const char *file,
             const unsigned int line,
-            const char *func);
+            const char *func,
+            const char *comp);
 
     void log(yarp::os::Log::LogType type,
              bool forward,
@@ -28,17 +29,20 @@ public:
                                const char *msg,
                                const char *file,
                                const unsigned int line,
-                               const char *func);
+                               const char *func,
+                               const char *comp);
 
     static void forward_callback(yarp::os::Log::LogType t,
                                  const char *msg,
                                  const char *file,
                                  const unsigned int line,
-                                 const char *func);
+                                 const char *func,
+                                 const char *comp);
 
     const char *file;
     const unsigned int line;
     const char *func;
+    const char *comp;
 
     static bool colored_output;
     static bool verbose_output;
