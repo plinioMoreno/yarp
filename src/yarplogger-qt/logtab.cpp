@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C)2014  iCub Facility - Istituto Italiano di Tecnologia
  * Author: Marco Randazzo
  * email:  marco.randazzo@iit.it
@@ -19,54 +19,50 @@
 #include "logtab.h"
 #include "ui_logtab.h"
 
-LogTab::LogTab(yarp::yarpLogger::LoggerEngine*  _theLogger, MessageWidget* _system_message, std::string _portName, QWidget *parent, int refreshRate) :
-    QFrame(parent),
-    ui(new Ui::LogTab)
-{
-    system_message = _system_message;
-    theLogger= _theLogger;
-    portName =_portName;
-    displayYarprunTimestamp_enabled=true;
-    displayLocalTimestamp_enabled=true;
-    displayColors_enabled=true;
-    displayGrid_enabled=true;
-    displayErrorLevel_enabled=true;
-    ui->setupUi(this);
-    model_logs = new QStandardItemModel();
-    proxyModelButtons = new LogSortFilterProxyModel(this);
-    proxyModelSearch = new LogSortFilterProxyModel(this);
-#define USE_FILTERS 1
+
+LogTab::LogTab(yarp::yarpLogger::LoggerEngine* _theLogger,
+               MessageWidget* _system_message,
+               std::string _portName,
+               QWidget *parent,
+               int refreshRate) :
+        QFrame(parent),
+        ui(new Ui::LogTab),
+        portName(_portName),
+        theLogger(_theLogger),
+        system_message(_system_message),
+        displayYarprunTimestamp_enabled(true),
+        displayLocalTimestamp_enabled(true),
+        displayLogLevel_enabled(true),
+        displayFilename_enabled(false),
+        displayLine_enabled(false),
+        displayFunction_enabled(false),
+        displayThreadId_enabled(false),
+        displayComponent_enabled(true),
+        displayColors_enabled(true),
+        displayGrid_enabled(true),
+        logTimer(new QTimer(this)),
+        logModel(new LogModel()),
 #if USE_FILTERS
-    proxyModelButtons->setSourceModel(model_logs);
+        proxyModelButtons(new LogSortFilterProxyModel(this)),
+        proxyModelSearch(new LogSortFilterProxyModel(this)),
+#endif
+        clipboard(QApplication::clipboard())
+{
+    ui->setupUi(this);
+
+
+#if USE_FILTERS
+    proxyModelButtons->setSourceModel(logModel);
     proxyModelSearch->setSourceModel(proxyModelButtons);
-    proxyModelSearch->setFilterKeyColumn(-1); 
+    proxyModelSearch->setFilterKeyColumn(-1);
     ui->listView->setModel(proxyModelSearch);
 #else
-    ui->listView->setModel(model_logs);
+    ui->listView->setModel(logModel);
 #endif
-    ui->listView->verticalHeader()->setVisible(false);
-    ui->listView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->listView->setAutoScroll(true);
 
-    logTimer = new QTimer(this);
     connect(logTimer, SIGNAL(timeout()), this, SLOT(updateLog()));
     logTimer->start(refreshRate);
 
-    model_logs->setHorizontalHeaderItem(0,new QStandardItem(tr("yarprun timestamp")));
-    model_logs->setHorizontalHeaderItem(1,new QStandardItem(tr("local timestamp")));
-    model_logs->setHorizontalHeaderItem(2,new QStandardItem(tr("level")));
-    model_logs->setHorizontalHeaderItem(3,new QStandardItem(tr("component")));
-    model_logs->setHorizontalHeaderItem(4,new QStandardItem(tr("message")));
-    ui->listView->setColumnWidth(0,120);
-    ui->listView->setColumnWidth(1,120);
-    ui->listView->setColumnWidth(2,120);
-    ui->listView->setColumnWidth(3,120);
-    ui->listView->setColumnWidth(4,100);
-    ui->listView->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Stretch);
-    ui->listView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->listView->verticalHeader()->setDefaultSectionSize(20);
-
-    clipboard=QApplication::clipboard();
     connect(ui->listView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
 
     updateLog(true);
@@ -86,22 +82,31 @@ void LogTab::on_copy_to_clipboard_action()
     foreach(const QModelIndex &index, ui->listView->selectionModel()->selectedRows())
     {
         QStringList list;
+#if USE_FILTERS
         QModelIndex prox_index_pre = proxyModelSearch->mapToSource(index);
-        if (prox_index_pre.isValid() == false)
+        if (!prox_index_pre.isValid())
         {
             system_message->addMessage(QString("Invalid prox_index_pre in copy_to_clipboard"));
             return;
         }
         QModelIndex prox_index     = proxyModelButtons->mapToSource(prox_index_pre);
-        if (prox_index.isValid() == false)
+        if (!prox_index.isValid())
         {
             system_message->addMessage(QString("Invalid prox_index in copy_to_clipboard"));
             return;
         }
-        if (displayYarprunTimestamp_enabled) list.append(model_logs->item(prox_index.row(),0)->text());
-        if (displayLocalTimestamp_enabled)   list.append(model_logs->item(prox_index.row(),1)->text());
-        if (displayErrorLevel_enabled)       list.append(model_logs->item(prox_index.row(),2)->text());
-        list.append(model_logs->item(prox_index.row(),3)->text());
+#else
+        QModelIndex prox_index = index;
+#endif
+        if (displayYarprunTimestamp_enabled) list.append(logModel->data(prox_index, LogModel::YarprunTimestampRole).toString());
+        if (displayLocalTimestamp_enabled)   list.append(logModel->data(prox_index, LogModel::LocalTimestampRole).toString());
+        if (displayLogLevel_enabled)         list.append(logModel->data(prox_index, LogModel::LogLevelStringRole).toString());
+        if (displayFilename_enabled)         list.append(logModel->data(prox_index, LogModel::FilenameRole).toString());
+        if (displayLine_enabled)             list.append(logModel->data(prox_index, LogModel::LineStringRole).toString());
+        if (displayFunction_enabled)         list.append(logModel->data(prox_index, LogModel::FunctionRole).toString());
+        if (displayThreadId_enabled)         list.append(logModel->data(prox_index, LogModel::ThreadIdRole).toString());
+        if (displayComponent_enabled)        list.append(logModel->data(prox_index, LogModel::ComponentRole).toString());
+        list.append(logModel->data(prox_index, LogModel::TextRole).toString());
         selected_test += list.join(separator);
     }
     clipboard->setText(selected_test);
@@ -110,103 +115,122 @@ void LogTab::on_copy_to_clipboard_action()
 LogTab::~LogTab()
 {
     delete logTimer;
-    delete model_logs;
+    delete logModel;
+#if USE_FILTERS
     delete proxyModelButtons;
     delete proxyModelSearch;
+#endif
     delete ui;
 }
 
-void LogTab::clear_model_logs()
+void LogTab::clearLogModel()
 {
     mutex.lock();
-    if (model_logs) model_logs->removeRows(0,model_logs->rowCount());
+    if (logModel) {
+        logModel->clear();
+    }
     mutex.unlock();
 }
 
 void LogTab::updateLog(bool from_beginning)
 {
-    /*
-    //@@@@ performance test, to be removed later
-    static double to=yarp::os::Time::now();
-    static double prev;
-    double tt = yarp::os::Time::now()-to;
-    char buf [50];
-    double tt3 = tt-prev;
-    prev = tt;
-    sprintf(buf,"%3.5f %3.5f %3.5f",tt, tt3);
-    system_message->addMessage(QString(buf),LOGWIDGET_WARNING);
-    */
-
     mutex.lock();
     std::list<yarp::yarpLogger::MessageEntry> messages;
-    this->theLogger->get_messages_by_port_complete(portName,messages, from_beginning);
-    std::list<yarp::yarpLogger::MessageEntry>::iterator it;
-    QStandardItem *rootNode = model_logs->invisibleRootItem();
-    for (it=messages.begin(); it!=messages.end(); it++)
-    {
-        QList<QStandardItem *> rowItem;
-        QColor rowbgcolor = QColor(Qt::white);
-        QColor rowfgcolor = QColor(Qt::black);
-        std:: string error_level;
-        if      (it->level==yarp::yarpLogger::LOGLEVEL_UNDEFINED) { rowbgcolor = QColor(Qt::white);  error_level="";     }
-        else if (it->level==yarp::yarpLogger::LOGLEVEL_TRACE)     { rowbgcolor = QColor("#E9E9E9");  error_level=TRACE_STRING;}
-        else if (it->level==yarp::yarpLogger::LOGLEVEL_DEBUG)     { rowbgcolor = QColor("#7070FF");  error_level=DEBUG_STRING;}
-        else if (it->level==yarp::yarpLogger::LOGLEVEL_INFO)      { rowbgcolor = QColor("#70FF70");  error_level=INFO_STRING; }
-        else if (it->level==yarp::yarpLogger::LOGLEVEL_WARNING)   { rowbgcolor = QColor("#FFFF70");  error_level=WARNING_STRING; }
-        else if (it->level==yarp::yarpLogger::LOGLEVEL_ERROR)     { rowbgcolor = QColor("#FF7070");  error_level=ERROR_STRING;}
-        else if (it->level==yarp::yarpLogger::LOGLEVEL_FATAL)     { rowbgcolor = QColor(Qt::black);  rowfgcolor = QColor(Qt::white);  error_level=FATAL_STRING;}
-        else                                                      { rowbgcolor = QColor(Qt::white);  error_level="";     }
+    theLogger->get_messages_by_port_complete(portName, messages, from_beginning);
+    logModel->addMessages(messages);
 
-        //using numbers seems not to work. Hence I'm using strings.
-        rowItem << new QStandardItem(it->yarprun_timestamp.c_str())
-                << new QStandardItem(it->local_timestamp.c_str())
-                << new QStandardItem(error_level.c_str())
-                << new QStandardItem(it->component.c_str())
-                << new QStandardItem(it->text.c_str());
-
-        if (displayColors_enabled)
-        {
-            for (QList<QStandardItem *>::iterator col_it = rowItem.begin(); col_it != rowItem.end(); col_it++)
-            {
-                (*col_it)->setBackground(rowbgcolor);
-                (*col_it)->setForeground(rowfgcolor);
-            }
-        }
-        rootNode->appendRow(rowItem);
-    }
-    ui->listView->setColumnHidden(0,!displayYarprunTimestamp_enabled);
-    ui->listView->setColumnHidden(1,!displayLocalTimestamp_enabled);
-    ui->listView->setColumnHidden(2,!displayErrorLevel_enabled);
+    ui->listView->setColumnHidden(YARPRUNTIMESTAMP_COLUMN, !displayYarprunTimestamp_enabled);
+    ui->listView->setColumnHidden(LOCALTIMESTAMP_COLUMN,   !displayLocalTimestamp_enabled);
+    ui->listView->setColumnHidden(LOGLEVEL_COLUMN,         !displayLogLevel_enabled);
+    ui->listView->setColumnHidden(FILENAME_COLUMN,         !displayFilename_enabled);
+    ui->listView->setColumnHidden(LINE_COLUMN,             !displayLine_enabled);
+    ui->listView->setColumnHidden(FUNCTION_COLUMN,         !displayFunction_enabled);
+    ui->listView->setColumnHidden(THREADID_COLUMN,         !displayThreadId_enabled);
+    ui->listView->setColumnHidden(COMPONENT_COLUMN,        !displayComponent_enabled);
     ui->listView->setShowGrid(displayGrid_enabled);
     mutex.unlock();
 }
 
-void LogTab::displayYarprunTimestamp  (bool enabled)
+void LogTab::displayYarprunTimestamp(bool enabled)
 {
-    displayYarprunTimestamp_enabled=enabled;
-    ui->listView->setColumnHidden(0,!displayYarprunTimestamp_enabled);
+    displayYarprunTimestamp_enabled = enabled;
+    ui->listView->setColumnHidden(YARPRUNTIMESTAMP_COLUMN, !displayYarprunTimestamp_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(YARPRUNTIMESTAMP_COLUMN, 115);
+    }
 }
 
-void LogTab::displayLocalTimestamp  (bool enabled)
+void LogTab::displayLocalTimestamp(bool enabled)
 {
-    displayLocalTimestamp_enabled=enabled;
-    ui->listView->setColumnHidden(1,!displayLocalTimestamp_enabled);
+    displayLocalTimestamp_enabled = enabled;
+    ui->listView->setColumnHidden(LOCALTIMESTAMP_COLUMN, !displayLocalTimestamp_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(LOCALTIMESTAMP_COLUMN, 115);
+    }
 }
 
-void LogTab::displayErrorLevel (bool enabled)
+void LogTab::displayLogLevel(bool enabled)
 {
-    displayErrorLevel_enabled=enabled;
-    ui->listView->setColumnHidden(2,!displayErrorLevel_enabled);
+    displayLogLevel_enabled = enabled;
+    ui->listView->setColumnHidden(LOGLEVEL_COLUMN, !displayLogLevel_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(LOGLEVEL_COLUMN, 60);
+    }
 }
 
-void LogTab::displayColors     (bool enabled)
+void LogTab::displayFilename(bool enabled)
 {
-    displayColors_enabled=enabled;
-    //ui->listView->
+    displayFilename_enabled = enabled;
+    ui->listView->setColumnHidden(FILENAME_COLUMN, !displayFilename_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(FILENAME_COLUMN, 120);
+    }
 }
 
-void LogTab::displayGrid       (bool enabled)
+void LogTab::displayLine(bool enabled)
 {
-    displayGrid_enabled=enabled;
+    displayLine_enabled = enabled;
+    ui->listView->setColumnHidden(LINE_COLUMN, !displayLine_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(LINE_COLUMN, 40);
+    }
+}
+
+void LogTab::displayFunction(bool enabled)
+{
+    displayFunction_enabled = enabled;
+    ui->listView->setColumnHidden(FUNCTION_COLUMN, !displayFunction_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(FUNCTION_COLUMN, 120);
+    }
+}
+
+void LogTab::displayThreadId(bool enabled)
+{
+    displayThreadId_enabled = enabled;
+    ui->listView->setColumnHidden(THREADID_COLUMN, !displayThreadId_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(THREADID_COLUMN, 80);
+    }
+}
+
+void LogTab::displayComponent(bool enabled)
+{
+    displayComponent_enabled = enabled;
+    ui->listView->setColumnHidden(COMPONENT_COLUMN, !displayComponent_enabled);
+    if (enabled) {
+        ui->listView->setColumnWidth(COMPONENT_COLUMN, 110);
+    }
+}
+
+void LogTab::displayColors(bool enabled)
+{
+    displayColors_enabled = enabled;
+    logModel->setColor(enabled);
+}
+
+void LogTab::displayGrid(bool enabled)
+{
+    displayGrid_enabled = enabled;
     ui->listView->setShowGrid(displayGrid_enabled);
 }
