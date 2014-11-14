@@ -44,6 +44,7 @@ public:
     const char *func;
     const char *comp;
 
+    static bool is_yarprun;
     static bool colored_output;
     static bool verbose_output;
     static bool debug_output;

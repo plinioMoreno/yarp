@@ -64,7 +64,7 @@
 
 #define THREAD_ID (int)(long int)(PLATFORM_THREAD_SELF())
 
-static bool from_env(const char* name, bool defaultvalue) {
+static inline bool from_env(const char* name, bool defaultvalue) {
     const char *strvalue = yarp::os::getenv(name);
 
     if(!strvalue) return defaultvalue;
@@ -88,11 +88,70 @@ static bool from_env(const char* name, bool defaultvalue) {
     return defaultvalue;
 }
 
-bool yarp::os::impl::LogImpl::colored_output(from_env("YARP_COLORED_OUTPUT", false));
-bool yarp::os::impl::LogImpl::verbose_output(from_env("YARP_VERBOSE_OUTPUT", false));
+static inline const char* logTypeToString(yarp::os::Log::LogType t)
+{
+    switch (t) {
+    case yarp::os::Log::TraceType:
+        return "TRACE";
+    case yarp::os::Log::DebugType:
+        return "DEBUG";
+    case yarp::os::Log::InfoType:
+        return "INFO";
+    case yarp::os::Log::WarningType:
+        return "WARNING";
+    case yarp::os::Log::ErrorType:
+        return "ERROR";
+    case yarp::os::Log::FatalType:
+        return "FATAL";
+    default:
+        return "";
+    }
+}
+
+static inline const char* logTypeToColor(yarp::os::Log::LogType t)
+{
+    switch (t) {
+    case yarp::os::Log::TraceType:
+        return WHITE;
+    case yarp::os::Log::DebugType:
+        return GREEN;
+    case yarp::os::Log::InfoType:
+        return BLUE;
+    case yarp::os::Log::WarningType:
+        return YELLOW;
+    case yarp::os::Log::ErrorType:
+        return RED;
+    case yarp::os::Log::FatalType:
+        return WHITE;
+    default:
+        return "";
+    }
+}
+
+static inline const char* logTypeToBgColor(yarp::os::Log::LogType t)
+{
+    switch (t) {
+    case yarp::os::Log::FatalType:
+        return RED_BG;
+    case yarp::os::Log::TraceType:
+    case yarp::os::Log::DebugType:
+    case yarp::os::Log::InfoType:
+    case yarp::os::Log::WarningType:
+    case yarp::os::Log::ErrorType:
+    default:
+        return "";
+    }
+}
+
+
+
+bool yarp::os::impl::LogImpl::is_yarprun(from_env("YARP_IS_YARPRUN", false));
+bool yarp::os::impl::LogImpl::colored_output(from_env("YARP_COLORED_OUTPUT", false) && !yarp::os::impl::LogImpl::is_yarprun);
+bool yarp::os::impl::LogImpl::verbose_output(from_env("YARP_VERBOSE_OUTPUT", false) && !yarp::os::impl::LogImpl::is_yarprun);
+bool yarp::os::impl::LogImpl::forward_output(from_env("YARP_FORWARD_LOG_ENABLE", false) && !yarp::os::impl::LogImpl::is_yarprun);
+
 bool yarp::os::impl::LogImpl::debug_output(from_env("YARP_DEBUG_ENABLE", true));
 bool yarp::os::impl::LogImpl::trace_output(from_env("YARP_TRACE_ENABLE", false) && yarp::os::impl::LogImpl::debug_output);
-bool yarp::os::impl::LogImpl::forward_output(from_env("YARP_FORWARD_LOG_ENABLE", false));
 
 yarp::os::Log::LogCallback yarp::os::Log::print_callback = yarp::os::impl::LogImpl::print_callback;
 yarp::os::Log::LogCallback yarp::os::Log::forward_callback = yarp::os::impl::LogImpl::forward_callback;
@@ -108,6 +167,27 @@ yarp::os::impl::LogImpl::LogImpl(const char *file,
 {
 }
 
+
+static inline void pristine_output(std::ostream *ost,
+                                   const char *level,
+                                   const char *msg,
+                                   const char *file,
+                                   const unsigned int line,
+                                   const char *func,
+                                   const char *comp)
+{
+    *ost << "[" << level << "]";
+    *ost << "[filename=" << file << "]";
+    *ost << "[line=" << line << "]";
+    *ost << "[function=" << func << "]";
+    *ost << "[thread_id=0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << "]";
+    if (comp) {
+        *ost << "[component=" << comp << "]";
+    }
+    if (msg[0]) {
+        *ost << msg;
+    }
+}
 
 
 void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
@@ -133,55 +213,36 @@ void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
         ost = &std::cerr;
     }
 
-    const char *color = "";
-    const char *bgcolor = "";
-    const char *tag = "";
+    const char *level = logTypeToString(t);
+    const char *color = logTypeToColor(t);
+    const char *bgcolor = logTypeToBgColor(t);
 
-    switch (t) {
-    case yarp::os::Log::TraceType:
-        color = WHITE;
-        tag = "TRACE";
-        break;
-    case yarp::os::Log::DebugType:
-        color = GREEN;
-        tag = "DEBUG";
-        break;
-    case yarp::os::Log::InfoType:
-        color = BLUE;
-        tag = "INFO";
-        break;
-    case yarp::os::Log::WarningType:
-        color = YELLOW;
-        tag = "WARNING";
-        break;
-    case yarp::os::Log::ErrorType:
-        color = RED;
-        tag = "ERROR";
-        break;
-    case yarp::os::Log::FatalType:
-        color = WHITE;
-        bgcolor = RED_BG;
-        tag = "FATAL";
-        break;
-    default:
-        break;
+    if (is_yarprun) {
+        // Same output as forward_callback
+        pristine_output(ost, level, msg, file, line, func, comp);
+    } else {
+        *ost << "[" << color << bgcolor << level << CLEAR << "]";
+        if (verbose_output) {
+            // Verbose, but readable (do not use the tags)
+            *ost << file << ":" << line << " " << color << bgcolor << func << CLEAR;
+            *ost << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
+            *ost << (msg[0] || comp ? ": " : "");
+        } else if (t == yarp::os::Log::TraceType) {
+            // Printing function with trace is not necessary in verbose mode
+            // since it is already printed
+            *ost << WHITE << func << CLEAR << (msg[0] || comp ? ": " : "");
+        }
+
+        if (comp) {
+            *ost << "[" << comp << "] ";
+        }
+
+        // Finally print the message (if there is one)
+        if (msg[0]) {
+            *ost << msg;
+        }
     }
 
-    *ost << "[" << color << bgcolor << tag << CLEAR << "]";
-
-    if (verbose_output) {
-        *ost << file << ":" << line << " " << color << bgcolor << func << CLEAR;
-        *ost << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
-        *ost << (msg[0] || comp ? ": " : "");
-    } else if (t == yarp::os::Log::TraceType) {
-        *ost << WHITE << func << CLEAR << (msg[0] || comp ? ": " : "");
-    }
-    if (comp) {
-        *ost << "[" << comp << "] ";
-    }
-    if (msg[0]) {
-        *ost << msg;
-    }
     *ost << std::endl;
 }
 
@@ -202,53 +263,12 @@ void yarp::os::impl::LogImpl::forward_callback(yarp::os::Log::LogType t,
         return;
     }
 
+    const char *level = logTypeToString(t);
+
     std::stringstream stringstream_buffer;
-    LogForwarder* theForwarder = LogForwarder::getInstance();
+    pristine_output(&stringstream_buffer, level, msg, file, line, func, comp);
 
-    const char *tag = "";
-
-    switch (t) {
-    case yarp::os::Log::TraceType:
-        tag = "TRACE";
-        break;
-    case yarp::os::Log::DebugType:
-        tag = "DEBUG";
-        break;
-    case yarp::os::Log::InfoType:
-        tag = "INFO";
-        break;
-    case yarp::os::Log::WarningType:
-        tag = "WARNING";
-        break;
-    case yarp::os::Log::ErrorType:
-        tag = "ERROR";
-        break;
-    case yarp::os::Log::FatalType:
-        tag = "FATAL";
-        break;
-    default:
-        break;
-    }
-
-    stringstream_buffer << "[" << tag << "]";
-
-    if (verbose_output) {
-        stringstream_buffer << file << ":" << line << " " << func;
-        stringstream_buffer << "(0x" << std::hex << std::setfill('0') << std::setw(8) << THREAD_ID << ")";
-        stringstream_buffer << (msg[0] || comp ? ": " : "");
-    }
-    if (comp) {
-        stringstream_buffer << "[component=" << comp << "]";
-    }
-    if (!verbose_output && t == yarp::os::Log::TraceType) {
-        stringstream_buffer << func << (msg[0] || comp ? ": " : "");
-    }
-    if (msg[0]) {
-        stringstream_buffer << msg;
-    }
-    stringstream_buffer << std::endl;
-
-    theForwarder->forward(stringstream_buffer.str());
+    LogForwarder::getInstance()->forward(stringstream_buffer.str());
 }
 
 yarp::os::Log::Log(const char *file,
