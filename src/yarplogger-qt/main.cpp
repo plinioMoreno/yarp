@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    yarp::os::ResourceFinder rf;
+    yarp::os::ResourceFinder &rf = yarp::os::ResourceFinder::getResourceFinderSingleton();
     rf.setVerbose(true);
     rf.setDefaultConfigFile("yarprunLogger.ini");           //overridden by --from parameter
     rf.setDefaultContext("yarprunLogger");                  //overridden by --context parameter
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         yarp::os::signal(yarp::os::YARP_SIGTERM, sighandler);
     }
 
-    MainWindow w(rf);
+    MainWindow w;
     w.show();
 
     return a.exec();
