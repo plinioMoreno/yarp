@@ -10,6 +10,7 @@
 #include <yarp/os/Os.h>
 #include <yarp/os/Time.h>
 #include <yarp/os/Log.h>
+#include <yarp/os/impl/PlatformStdio.h>
 
 yarp::os::LogForwarder* yarp::os::LogForwarder::instance = NULL;
 yarp::os::LogForwarderDestroyer yarp::os::LogForwarder::destroyer;
@@ -53,7 +54,7 @@ yarp::os::LogForwarder::LogForwarder()
     char prog_name [MAX_STRING_SIZE]; //unsafe
     yarp::os::getprogname(prog_name,MAX_STRING_SIZE);
     int pid = yarp::os::getpid();
-    sprintf(logPortName, "/log/%s/%s/%d",host_name,prog_name,pid);  //unsafe, better to use snprintf when available
+    ACE_OS::snprintf(logPortName, MAX_STRING_SIZE, "/log/%s/%s/%d",host_name,prog_name,pid);
     outputPort->open(logPortName);
     yarp::os::Network::connect(logPortName, "/yarplogger");
     //yarp::os::Network::connect(logPortName, "/test");
