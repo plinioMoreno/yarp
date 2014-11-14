@@ -29,8 +29,6 @@ static void sighandler (int signal)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-
     yarp::os::Network yarp;
     if (!yarp.checkNetwork())
     {
@@ -43,6 +41,8 @@ int main(int argc, char *argv[])
     rf.setDefaultConfigFile("yarprunLogger.ini");           //overridden by --from parameter
     rf.setDefaultContext("yarprunLogger");                  //overridden by --context parameter
     rf.configure(argc,argv);
+
+    QApplication a(argc, argv); // Eats the "--name" argument, therefore initialized after the ResourceFinder
 
     bool cannot_close = rf.check("no_stop");
     if (cannot_close)
