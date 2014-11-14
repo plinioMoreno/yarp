@@ -25,7 +25,6 @@
 #include <iterator>
 #include <yarp/os/RpcClient.h>
 #include <yarp/logger/YarpLogger.h>
-
 using namespace yarp::os;
 using namespace yarp::yarpLogger;
 using namespace std;
@@ -226,6 +225,34 @@ LoggerEngine::logger_thread::logger_thread (std::string _portname, int _rate,  i
         unknown_format_received      = 0;
 }
 
+
+inline static bool readTag(const std::string &tag_name, std::string &text, std::string *out)
+{
+    std::string t = "[" + tag_name + "=";
+    size_t str = text.find(t, 0);
+    size_t end = text.find(']', str);
+
+    if (str==std::string::npos || end==std::string::npos )
+    {
+        *out = "";
+        return false;
+    }
+    else if (str==0)
+    {
+        *out = text.substr(str + t.size(),
+                           end - t.length());
+        text = text.substr(end+1);
+        return true;
+    }
+    else
+    {
+        *out = "";
+        return false;
+    }
+}
+
+
+
 void LoggerEngine::logger_thread::run()
 {
     //if (is_discovering()==true)
@@ -300,18 +327,11 @@ void LoggerEngine::logger_thread::run()
                 body.level = LOGLEVEL_UNDEFINED;
             }
 
-            str = body.text.find("[component=", 0);
-            end = body.text.find(']', str);
-            if (str==std::string::npos || end==std::string::npos )
-            {
-                body.component = "";
-            }
-            else if (str==0)
-            {
-                body.component = body.text.substr(str + strlen("[component="),
-                                                  end - strlen("[component="));
-                body.text = body.text.substr(end+1);
-            }
+            readTag("filename", body.text, &(body.filename));
+            readTag("line", body.text, &(body.line));
+            readTag("function", body.text, &(body.function));
+            readTag("thread_id", body.text, &(body.thread_id));
+            readTag("component", body.text, &(body.component));
 
             if (body.level == LOGLEVEL_UNDEFINED && listen_to_LOGLEVEL_UNDEFINED == false) {continue;}
             if (body.level == LOGLEVEL_TRACE     && listen_to_LOGLEVEL_TRACE     == false) {continue;}
