@@ -68,7 +68,7 @@ yarp::os::LogForwarder::~LogForwarder()
         b.clear();
         std::string port = "["; port+=logPortName; port+="]";
         b.addString(port);
-        b.addString("[INFO] Execution terminated\n");
+        b.addString("[INFO]Execution terminated\n");
         outputPort->write(true);
         outputPort->waitForWrite();
         //outputPort->interrupt();
