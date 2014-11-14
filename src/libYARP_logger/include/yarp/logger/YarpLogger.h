@@ -64,6 +64,7 @@ namespace yarp
 struct yarp::yarpLogger::MessageEntry
 {
     LogLevelEnum  level;
+    std::string   component;
     std::string   text;
     std::string   yarprun_timestamp;
     std::string   local_timestamp;

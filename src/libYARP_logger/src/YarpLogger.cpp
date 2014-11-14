@@ -300,6 +300,19 @@ void LoggerEngine::logger_thread::run()
                 body.level = LOGLEVEL_UNDEFINED;
             }
 
+            str = body.text.find("[component=", 0);
+            end = body.text.find(']', str);
+            if (str==std::string::npos || end==std::string::npos )
+            {
+                body.component = "";
+            }
+            else if (str==0)
+            {
+                body.component = body.text.substr(str + strlen("[component="),
+                                                  end - strlen("[component="));
+                body.text = body.text.substr(end+1);
+            }
+
             if (body.level == LOGLEVEL_UNDEFINED && listen_to_LOGLEVEL_UNDEFINED == false) {continue;}
             if (body.level == LOGLEVEL_TRACE     && listen_to_LOGLEVEL_TRACE     == false) {continue;}
             if (body.level == LOGLEVEL_DEBUG     && listen_to_LOGLEVEL_DEBUG     == false) {continue;}
