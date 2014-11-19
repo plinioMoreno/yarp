@@ -1214,7 +1214,7 @@ bool PortCore::readBlock(ConnectionReader& reader, void *id, OutputStream *os) {
         interruptible = true;
     } else {
         // Read and ignore message, there is no where to send it.
-        YARP_DEBUG(Logger::get(),"data received in PortCore, no reader for it");
+        yDebugNoFw("data received in PortCore, no reader for it");
         Bottle b;
         result = b.read(reader);
     }

@@ -177,7 +177,7 @@ public:
         }
 
         if (closed) {
-            YARP_DEBUG(Logger::get(),"Port::read shutting down");
+            yDebugNoFw("Port::read shutting down");
             readBlock.post();
             return false;
         }
@@ -193,7 +193,7 @@ public:
             readResult = readDelegate->read(reader);
         } else {
             // read and ignore
-            YARP_DEBUG(Logger::get(),"data received in Port, no reader for it");
+            yDebugNoFw("data received in Port, no reader for it");
             Bottle b;
             b.read(reader);
         }
@@ -209,7 +209,7 @@ public:
         if (result&&willReply) {
             consume.wait();
             if (closed) {
-                YARP_DEBUG(Logger::get(),"Port::read shutting down");
+                yDebugNoFw("Port::read shutting down");
                 readBlock.post();
                 return false;
             }
@@ -528,7 +528,7 @@ bool Port::open(const Contact& contact, bool registerName,
     core.openable();
 
     if (NetworkBase::localNetworkAllocation()&&contact2.getPort()<=0) {
-        YARP_DEBUG(Logger::get(),"local network allocation needed");
+        yDebugNoFw("local network allocation needed");
         local = true;
     }
 
@@ -735,7 +735,6 @@ bool Port::write(PortWriter& writer, PortWriter *callback) const {
     result = core.send(writer,NULL,callback);
     //writer.onCompletion();
     if (!result) {
-        //YARP_DEBUG(Logger::get(), e.toString() + " <<<< Port::write saw this");
         if (callback!=NULL) {
             callback->onCompletion();
         } else {
@@ -758,7 +757,6 @@ bool Port::write(PortWriter& writer, PortReader& reader,
     bool result = false;
     result = core.send(writer,&reader,callback);
     if (!result) {
-        //YARP_DEBUG(Logger::get(), e.toString() + " <<<< Port::write saw this");
         if (callback!=NULL) {
             callback->onCompletion();
         } else {

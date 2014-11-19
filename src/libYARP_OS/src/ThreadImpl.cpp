@@ -67,7 +67,7 @@ static unsigned __stdcall theExecutiveBranch (void *args)
 
     ThreadImpl *thread = (ThreadImpl *)args;
 
-    YARP_DEBUG(Logger::get(),"Thread starting up");
+    yDebugNoFw("Thread starting up");
 
     bool success=thread->threadInit();
     thread->notify(success);
@@ -82,7 +82,7 @@ static unsigned __stdcall theExecutiveBranch (void *args)
     }
 
     ThreadImpl::changeCount(-1);
-    YARP_DEBUG(Logger::get(),"Thread shutting down");
+    yDebugNoFw("Thread shutting down");
     //ACE_Thread::exit();
 
     thread->notify(false);
@@ -116,7 +116,7 @@ ThreadImpl::ThreadImpl(Runnable *target) : synchro(0) {
 
 
 ThreadImpl::~ThreadImpl() {
-    YARP_DEBUG(Logger::get(),"Thread being deleted");
+    yDebugNoFw("Thread being deleted");
     join();
 }
 
@@ -256,19 +256,19 @@ bool ThreadImpl::start() {
         needJoin = true;
 
         // the thread started correctly, wait for the initialization
-        YARP_DEBUG(Logger::get(), String("Child thread initializing"));
+        yDebugNoFw("Child thread initializing");
         synchroWait();
         initWasSuccessful = true;
         if (opened)
         {
             ThreadImpl::changeCount(1);
-            YARP_DEBUG(Logger::get(),"Child thread initialized ok");
+            yDebugNoFw("Child thread initialized ok");
             afterStart(true);
             return true;
         }
         else
         {
-            YARP_DEBUG(Logger::get(),"Child thread did not initialize ok");
+            yDebugNoFw("Child thread did not initialize ok");
             //wait for the thread to really exit
             ThreadImpl::join(-1);
         }

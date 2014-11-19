@@ -76,15 +76,15 @@ public:
     }
 
     virtual void interrupt() {
-        YARP_DEBUG(Logger::get(),"^^^^^^^^^^^ interrupting socket");
+        yDebugNoFw("^^^^^^^^^^^ interrupting socket");
         if (happy) {
             happy = false;
             stream.close_reader();
-            YARP_DEBUG(Logger::get(),"^^^^^^^^^^^ interrupting socket reader");
+            yDebugNoFw("^^^^^^^^^^^ interrupting socket reader");
             stream.close_writer();
-            YARP_DEBUG(Logger::get(),"^^^^^^^^^^^ interrupting socket writer");
+            yDebugNoFw("^^^^^^^^^^^ interrupting socket writer");
             stream.close();
-            YARP_DEBUG(Logger::get(),"^^^^^^^^^^^ interrupting socket fully");
+            yDebugNoFw("^^^^^^^^^^^ interrupting socket fully");
         }
         //stream.close_writer();
         //stream.close();
@@ -106,7 +106,7 @@ public:
         if (!happy) { return -1; }
         if (result<=0) {
             happy = false;
-            YARP_DEBUG(Logger::get(),"bad socket read");
+            yDebugNoFw("bad socket read");
         }
         return result;
     }
@@ -122,7 +122,7 @@ public:
         if (!happy) { return -1; }
         if (result<=0) {
             happy = false;
-            YARP_DEBUG(Logger::get(),"bad socket read");
+            yDebugNoFw("bad socket read");
         }
         return result;
     }
@@ -137,7 +137,7 @@ public:
         }
         if (result<0) {
             happy = false;
-            YARP_DEBUG(Logger::get(),"bad socket write");
+            yDebugNoFw("bad socket write");
         }
     }
 

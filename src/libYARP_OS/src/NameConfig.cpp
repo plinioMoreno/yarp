@@ -105,7 +105,7 @@ String NameConfig::expandFilename(const char *fname) {
         yErrorNoFw("Cannot read configuration - please set YARP_CONF or HOME or HOMEPATH");
         ACE_OS::exit(1);
     }
-    YARP_DEBUG(Logger::get(),String("Configuration file: ") + conf.c_str());
+    yDebugNoFw("Configuration file: %s", conf.c_str());
     return conf.c_str();
 }
 
@@ -266,8 +266,7 @@ String NameConfig::getHostName(bool prefer_loopback, String seed) {
             ip = ConstString(hostname);
 #endif
 
-            YARP_DEBUG(Logger::get(), String("scanning network interface ") +
-                       ip.c_str());
+            yDebugNoFw("scanning network interface %s", ip.c_str());
 
             if (ip.find(":")!=ConstString::npos) continue;
 

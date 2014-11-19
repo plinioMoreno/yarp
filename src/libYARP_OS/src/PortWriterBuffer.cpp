@@ -45,7 +45,7 @@ public:
     }
 
     void finishWrites() {
-        YARP_DEBUG(Logger::get(), "finishing writes");
+        yDebugNoFw("finishing writes");
         bool done = false;
         while (!done) {
             stateSema.wait();
@@ -61,7 +61,7 @@ public:
                 completionSema.wait();
             }
         }
-        YARP_DEBUG(Logger::get(), "finished writes");
+        yDebugNoFw("finished writes");
     }
 
     void *get() {
@@ -69,14 +69,14 @@ public:
             // (Safe to check outside mutex)
             // oops, there is already a prepared and unwritten
             // object.  best remove it.
-            YARP_DEBUG(Logger::get(), "releasing unused buffer");
+            yDebugNoFw("releasing unused buffer");
             release();
         }
         stateSema.wait();
         PortCorePacket *packet = packets.getFreePacket();
         yAssert(packet!=NULL);
         if (packet->getContent()==NULL) {
-            YARP_DEBUG(Logger::get(), "creating a writer buffer");
+            yDebugNoFw("creating a writer buffer");
             //packet->setContent(owner.create(*this,packet),true);
             yarp::os::PortWriterWrapper *wrapper =
                 owner.create(*this,packet);
@@ -108,7 +108,7 @@ public:
 
     virtual void onCompletion(void *tracker) {
         stateSema.wait();
-        YARP_DEBUG(Logger::get(), "freeing up a writer buffer");
+        yDebugNoFw("freeing up a writer buffer");
         packets.freePacket((PortCorePacket*)tracker,false);
         outCt--;
         bool sig = finishing;

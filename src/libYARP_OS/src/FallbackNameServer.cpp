@@ -30,16 +30,16 @@ void FallbackNameServer::run() {
     send.join(getAddress(),true);
     listen.join(getAddress(),false);
 
-    YARP_DEBUG(Logger::get(),"Fallback server running");
+    yDebugNoFw("Fallback server running");
     while (listen.isOk()&&send.isOk()&&!closed) {
-        YARP_DEBUG(Logger::get(),"Fallback server waiting");
+        yDebugNoFw("Fallback server waiting");
         String msg;
         listen.beginPacket();
         msg = listen.readLine();
         listen.endPacket();
-        YARP_DEBUG(Logger::get(),"Fallback server got something");
+        yDebugNoFw("Fallback server got something");
         if (listen.isOk()&&!closed) {
-            YARP_DEBUG(Logger::get(),String("Fallback server got ") + msg);
+            yDebugNoFw("Fallback server got %s", msg.c_str());
             if (msg.find("NAME_SERVER ") == 0) {
                 Contact addr;
                 String result = owner.apply(msg,addr);

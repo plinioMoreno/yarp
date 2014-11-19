@@ -27,7 +27,7 @@ TcpFace::~TcpFace() {
 
 
 bool TcpFace::open(const Contact& address) {
-    YARP_DEBUG(Logger::get(),String("opening for address ") + address.toURI());
+    yDebugNoFw("opening for address %s", address.toURI().c_str());
 
     this->address = address;
 #ifdef YARP_HAS_ACE

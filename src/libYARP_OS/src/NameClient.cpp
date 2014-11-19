@@ -160,15 +160,15 @@ String NameClient::send(const String& cmd, bool multi) {
 
     do {
 
-        YARP_DEBUG(Logger::get(),String("sending to nameserver: ") + cmd);
+        yDebugNoFw("sending to nameserver: %s", cmd.c_str());
 
         if (isFakeMode()) {
-            //YARP_DEBUG(Logger::get(),"fake mode nameserver");
+            //yDebugNoFw("fake mode nameserver");
             return getServer().apply(cmd,Contact::bySocket("tcp","127.0.0.1",NetworkBase::getDefaultPortRange())) + "\n";
         }
 
         TcpFace face;
-        YARP_DEBUG(Logger::get(),String("connecting to ") + getAddress().toURI());
+        yDebugNoFw("connecting to %s", getAddress().toURI().c_str());
         OutputProtocol *ip = NULL;
         if (!retry) {
             ip = face.write(server);
@@ -220,7 +220,6 @@ String NameClient::send(const String& cmd, bool multi) {
             line = ip->getInputStream().readLine();
             if (!(ip->isOk())) {
                 more = false;
-                //YARP_DEBUG(Logger::get(), e.toString() + " <<< exception from name server");
                 retry = true;
                 break;
             }
@@ -228,8 +227,9 @@ String NameClient::send(const String& cmd, bool multi) {
                 if (line[0] == '*'||line[0] == '[') {
                     more = false;
                 }
+                result += "\n";
             }
-            result += line + "\n";
+            result += line;
         }
         ip->close();
         delete ip;
@@ -238,7 +238,7 @@ String NameClient::send(const String& cmd, bool multi) {
                       "<<< received from nameserver: %s",result.c_str());
     } while (retry&&!retried);
 
-    return result;
+    return (result + "\n");
 }
 
 
@@ -250,7 +250,7 @@ bool NameClient::send(Bottle& cmd, Bottle& reply) {
         return true;
     }
     if (isFakeMode()) {
-        YARP_DEBUG(Logger::get(),"fake mode nameserver");
+        yDebugNoFw("fake mode nameserver");
         return getServer().apply(cmd,reply,
                                  Contact::bySocket("tcp","127.0.0.1",NetworkBase::getDefaultPortRange()));
     } else {
@@ -431,8 +431,7 @@ void NameClient::setup() {
             yErrorNoFw("Cannot find name server");
         }
 
-        YARP_DEBUG(Logger::get(),String("name server address is ") + 
-                   address.toURI());
+        yDebugNoFw("name server address is %s", address.toURI().c_str());
         isSetup = true;
     }
 }

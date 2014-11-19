@@ -485,7 +485,7 @@ bool PortReaderBufferBase::read(ConnectionReader& connection) {
         //yErrorNoFw(">>>>>>>>>>>>>>>>> skipping data");
 
         // important to give reader a shot anyway, allowing proper closing
-        YARP_DEBUG(Logger::get(), "giving PortReaderBuffer chance to close");
+        yDebugNoFw("giving PortReaderBuffer chance to close");
         HELPER(implementation).contentSema.post();
     }
     return ok;
@@ -590,7 +590,7 @@ bool PortReaderBufferBase::acceptObjectBase(PortReader *obj,
         //yErrorNoFw(">>>>>>>>>>>>>>>>> skipping data");
 
         // important to give reader a shot anyway, allowing proper closing
-        YARP_DEBUG(Logger::get(), "giving PortReaderBuffer chance to close");
+        yDebugNoFw("giving PortReaderBuffer chance to close");
         HELPER(implementation).contentSema.post();
     }
 

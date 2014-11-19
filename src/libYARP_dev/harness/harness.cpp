@@ -189,10 +189,10 @@ int main(int argc, char *argv[]) {
     ConstString shortFileName = seek.substr(pos,seek.length()).c_str();
 
     PolyDriver dd;
-	YARP_DEBUG(Logger::get(), "harness opening...");
+	yDebugNoFw( "harness opening...");
 	
     bool ok = dd.open(p);
-    YARP_DEBUG(Logger::get(), "harness opened.");
+    yDebugNoFw( "harness opened.");
     result = ok?0:1;
 
     ConstString wrapperName = "";
@@ -251,9 +251,9 @@ int main(int argc, char *argv[]) {
     }
 
     if (ok) {
-        YARP_DEBUG(Logger::get(), "harness closing...");
+        yDebugNoFw( "harness closing...");
         dd.close();
-        YARP_DEBUG(Logger::get(), "harness closed.");
+        yDebugNoFw( "harness closed.");
     }
 
     // just checking for crashes, not device creation

@@ -326,11 +326,11 @@ bool Protocol::expectProtocolSpecifier() {
     yarp::os::Bytes header((char*)&buf[0],sizeof(buf));
     YARP_SSIZE_T len = is().readFull(header);
     if (len==-1) {
-        YARP_DEBUG(log,"no connection");
+        yDebugNoFw("no connection");
         return false;
     }
     if((size_t)len!=header.length()) {
-        YARP_DEBUG(log,"data stream died");
+        yDebugNoFw("data stream died");
         return false;
     }
     bool already = false;
@@ -350,7 +350,7 @@ bool Protocol::expectProtocolSpecifier() {
         }
     }
     if (delegate==NULL) {
-        YARP_DEBUG(log,"unrecognized protocol");
+        yDebugNoFw("unrecognized protocol");
         return false;
     }
     setRoute(getRoute().addCarrierName(delegate->getName()));

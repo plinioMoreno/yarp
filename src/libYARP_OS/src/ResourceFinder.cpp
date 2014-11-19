@@ -44,7 +44,7 @@ static ConstString expandUserFileName(const ConstString& fname) {
         yErrorNoFw("Cannot read configuration - please set YARP_CONF or HOME or HOMEPATH");
         ACE_OS::exit(1);
     }
-    YARP_DEBUG(Logger::get(),(ConstString("Configuration file: ") + conf).c_str());
+    yDebugNoFw("Configuration file: %s", conf.c_str());
     return conf;
 }
 

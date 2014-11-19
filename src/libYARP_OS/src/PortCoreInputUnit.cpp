@@ -31,14 +31,12 @@ using namespace yarp::os;
 bool PortCoreInputUnit::start() {
 
 
-    YARP_DEBUG(Logger::get(),String("new input connection to ")+
-               getOwner().getName()+ " starting");
+    yDebugNoFw("new input connection to %s starting", getOwner().getName().c_str());
 
     /*
     if (ip!=NULL) {
         Route route = ip->getRoute();
-        YARP_DEBUG(Logger::get(),String("starting output for ") +
-                   route.toString());
+        yDebugNoFw("starting output for %s", route.toString());
     }
     */
 
@@ -46,14 +44,11 @@ bool PortCoreInputUnit::start() {
 
     bool result = PortCoreUnit::start();
     if (result) {
-        YARP_DEBUG(Logger::get(),String("new input connection to ")+
-                   getOwner().getName()+ " started ok");
+        yDebugNoFw("new input connection to %s started ok", getOwner().getName().c_str());
         phase.wait();
         phase.post();
     } else {
-        YARP_DEBUG(Logger::get(),String("new input connection to ")+
-                   getOwner().getName()+ " failed to start");
-
+        yDebugNoFw("new input connection to %s failed to start", getOwner().getName().c_str());
         phase.post();
     }
 
@@ -81,8 +76,7 @@ void PortCoreInputUnit::run() {
             ip->open(getName().c_str());
         }
         if (!ok) {
-            YARP_DEBUG(Logger::get(),String("new input connection to ")+
-                       getOwner().getName()+ " is broken");
+            yDebugNoFw("new input connection to %s is broken", getOwner().getName().c_str());
             done = true;
         } else {
             route = ip->getRoute();
@@ -112,10 +106,10 @@ void PortCoreInputUnit::run() {
                     yInfoNoFw("%s", msg.c_str());
                     posted = true;
                 } else {
-                    YARP_DEBUG(Logger::get(),msg);
+                    yDebugNoFw("%s", msg.c_str());
                 }
             } else {
-                YARP_DEBUG(Logger::get(),msg);
+                yDebugNoFw("%s", msg.c_str());
             }
 
             // Report the new connection
@@ -359,13 +353,13 @@ void PortCoreInputUnit::run() {
 
     setDoomed();
 
-    YARP_DEBUG(Logger::get(),"PortCoreInputUnit closing ip");
+    yDebugNoFw("PortCoreInputUnit closing ip");
     access.wait();
     if (ip!=NULL) {
         ip->close();
     }
     access.post();
-    YARP_DEBUG(Logger::get(),"PortCoreInputUnit closed ip");
+    yDebugNoFw("PortCoreInputUnit closed ip");
 
     if (autoHandshake) {
         String msg = String("Removing input from ") +
@@ -376,7 +370,7 @@ void PortCoreInputUnit::run() {
                 yInfoNoFw("%s", msg.c_str());
             }
         } else {
-            YARP_DEBUG(Logger::get(),"PortCoreInputUnit (unrooted) shutting down");
+            yDebugNoFw("PortCoreInputUnit (unrooted) shutting down");
         }
 
         getOwner().reportUnit(this,false);
@@ -399,7 +393,7 @@ void PortCoreInputUnit::run() {
         }
 
     } else {
-        YARP_DEBUG(Logger::get(),"PortCoreInputUnit shutting down");
+        yDebugNoFw("PortCoreInputUnit shutting down");
     }
 
     if (localReader!=NULL) {

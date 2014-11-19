@@ -70,7 +70,7 @@ bool yarp::os::impl::McastCarrier::sendHeader(ConnectionState& proto) {
     bool ok = defaultSendHeader(proto);
     if (!ok) return false;
 
-    YARP_DEBUG(Logger::get(),"Adding extra mcast header");
+    yDebugNoFw("Adding extra mcast header");
 
     Contact addr;
 
@@ -80,7 +80,7 @@ bool yarp::os::impl::McastCarrier::sendHeader(ConnectionState& proto) {
         "/net=" + alt.getHost();
     McastCarrier *elect = getCaster().getElect(altKey);
     if (elect!=NULL) {
-        YARP_DEBUG(Logger::get(),"picking up peer mcast name");
+        yDebugNoFw("picking up peer mcast name");
         addr = elect->mcastAddress;
         mcastName = elect->mcastName;
     } else {
@@ -130,7 +130,7 @@ bool yarp::os::impl::McastCarrier::sendHeader(ConnectionState& proto) {
 }
 
 bool yarp::os::impl::McastCarrier::expectExtraHeader(ConnectionState& proto) {
-    YARP_DEBUG(Logger::get(),"Expecting extra mcast header");
+    yDebugNoFw("Expecting extra mcast header");
     ManagedBytes block(6);
     YARP_SSIZE_T len = proto.is().readFull(block.bytes());
     if ((size_t)len!=block.length()) {
@@ -152,7 +152,7 @@ bool yarp::os::impl::McastCarrier::expectExtraHeader(ConnectionState& proto) {
     }
     port = 256*base[4]+base[5];
     Contact addr = Contact::bySocket("mcast",add,port);
-    YARP_DEBUG(Logger::get(),String("got mcast header ") + addr.toURI());
+    yDebugNoFw("got mcast header %s", addr.toURI().c_str());
     mcastAddress = addr;
 
     return true;
@@ -194,8 +194,7 @@ bool yarp::os::impl::McastCarrier::becomeMcast(ConnectionState& proto, bool send
             key += "/net=";
             key += local.getHost();
         }
-        YARP_DEBUG(Logger::get(),
-                    String("multicast key: ") + key);
+        yDebugNoFw("multicast key: %s", key.c_str());
         addSender(key);
     }
 

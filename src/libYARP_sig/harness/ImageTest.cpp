@@ -313,8 +313,8 @@ public:
         bot.fromBinary(s.c_str(),s.length());
         checkEqual(bot.size(),4,"plausible bottle out");
         checkEqual(bot.get(0).toString().c_str(),"mat","good tag");
-        YARP_DEBUG(Logger::get(),"an example image:");
-        YARP_DEBUG(Logger::get(),bot.toString().c_str());
+        yDebugNoFw("an example image:");
+        yDebugNoFw("%s", bot.toString().c_str());
     }
 
     void testDraw() {

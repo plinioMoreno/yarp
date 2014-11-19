@@ -173,7 +173,7 @@ private:
 
     public:
         HostRecord() {
-            //YARP_DEBUG(Logger::get(),"FIXME: HostRecord has hardcoded base");
+            //yDebugNoFw("FIXME: HostRecord has hardcoded base");
             base = 0;
             legacyStep = 10;
         }
@@ -184,8 +184,7 @@ private:
 
         int get() {
             int result = ReusableRecord<int>::getFree();
-            //YARP_DEBUG(Logger::get(), String("host record says ") +
-            //NetType::toString(result) + " is free");
+            //yDebugNoFw("host record says %d is free", result);
             return result;
         }
 
@@ -205,7 +204,7 @@ private:
     public:
 
         McastRecord() {
-            //YARP_DEBUG(Logger::get(),"FIXME: mcast records are never reused");
+            //yDebugNoFw("FIXME: mcast records are never reused");
             base = 0;
             basePort = 0;
             last = 0;

@@ -41,7 +41,7 @@ void FallbackNameClient::run() {
         String txt = listen.readLine();
         listen.endPacket();
         if (closed) return;
-        YARP_DEBUG(Logger::get(),String("Fallback name client got ") + txt);
+        yDebugNoFw("Fallback name client got %s", txt.c_str());
         if (txt.find("registration ")==0) {
             address = NameClient::extractAddress(txt);
             yInfoNoFw("Received address %s", address.toURI().c_str());

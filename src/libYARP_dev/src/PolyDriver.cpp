@@ -260,9 +260,9 @@ bool PolyDriver::coreOpen(yarp::os::Searchable& prop) {
         bool ok = driver->open(*config);
         if (!ok) {
             printf("yarpdev: ***ERROR*** driver <%s> was found but could not open\n", config->find("device").toString().c_str());
-            //YARP_DEBUG(Logger::get(),String("Discarding ") + str);
+            //yDebugNoFw("Discarding %s", str.c_str());
             delete driver;
-            //YARP_DEBUG(Logger::get(),String("Discarded ") + str);
+            //yDebugNoFw("Discarded %s", str.c_str());
             driver = NULL;
         } else {
             if (creator!=NULL) {

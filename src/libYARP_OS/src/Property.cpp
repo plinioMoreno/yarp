@@ -381,9 +381,7 @@ public:
                       Value(""),
                       "path to search for config files").toString().c_str();
 
-        YARP_DEBUG(Logger::get(),
-                   String("looking for ") + fname.c_str() + ", search path: " +
-                   searchPath);
+        yDebugNoFw("looking for %s, search path: %s", fname.c_str(), searchPath.c_str());
 
         String pathPrefix("");
         String txt;
@@ -397,9 +395,7 @@ public:
                 trial += '/';
                 trial += fname;
 
-                YARP_DEBUG(Logger::get(),
-                           String("looking for ") + fname + " as " +
-                           trial.c_str());
+                yDebugNoFw("looking for %s as %s", fname.c_str(), trial.c_str());
 
                 txt = "";
                 if (readFile(trial.c_str(),txt,true)) {

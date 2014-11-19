@@ -234,15 +234,15 @@ bool yarp::os::impl::LocalCarrier::expectReplyToHeader(ConnectionState& proto) {
 
 bool yarp::os::impl::LocalCarrier::expectIndex(ConnectionState& proto) {
 
-    YARP_DEBUG(Logger::get(),"local recv: wait send");
+    yDebugNoFw("local recv: wait send");
     sent.wait();
-    YARP_DEBUG(Logger::get(),"local recv: got send");
+    yDebugNoFw("local recv: got send");
     proto.setReference(ref);
     received.post();
     if (ref!=NULL) {
-        YARP_DEBUG(Logger::get(),"local recv: received");
+        yDebugNoFw("local recv: received");
     } else {
-        YARP_DEBUG(Logger::get(),"local recv: shutdown");
+        yDebugNoFw("local recv: shutdown");
         proto.is().interrupt();
         return false;
     }
@@ -252,11 +252,11 @@ bool yarp::os::impl::LocalCarrier::expectIndex(ConnectionState& proto) {
 
 void yarp::os::impl::LocalCarrier::accept(yarp::os::Portable *ref) {
     this->ref = ref;
-    YARP_DEBUG(Logger::get(),"local send: send ref");
+    yDebugNoFw("local send: send ref");
     sent.post();
     if (ref!=NULL&&!doomed) {
-        YARP_DEBUG(Logger::get(),"local send: wait receipt");
+        yDebugNoFw("local send: wait receipt");
         received.wait();
-        YARP_DEBUG(Logger::get(),"local send: received");
+        yDebugNoFw("local send: received");
     }
 }

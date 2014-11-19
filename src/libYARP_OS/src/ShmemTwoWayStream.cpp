@@ -30,8 +30,7 @@ int ShmemTwoWayStream::open(const Address& address, bool sender) {
     int result = -1;
     happy = false;
     ACE_INET_Addr addr(address.getPort(),address.getHost().c_str());
-    YARP_DEBUG(Logger::get(),String("trying to open shmem port ") +
-               NetType::toString(address.getPort()));
+    yDebugNoFw("trying to open shmem port %d", address.getPort());
     if (sender) {
         ACE_MEM_Connector connector;
 
@@ -41,7 +40,7 @@ int ShmemTwoWayStream::open(const Address& address, bool sender) {
 
         result = connector.connect(stream,addr,0,ACE_Addr::sap_any,1);
         if (result>=0) {
-            YARP_DEBUG(Logger::get(),"shmem sender connect succeeded");
+            yDebugNoFw("shmem sender connect succeeded");
             happy = true;
         } else {
             yErrorNoFw("*** Shared memory connection failed");
@@ -68,7 +67,7 @@ int ShmemTwoWayStream::open(const Address& address, bool sender) {
         remoteAddress = localAddress; // finalized in call to accept()
 
         if (result>=0) {
-            YARP_DEBUG(Logger::get(),"shmem receiver open succeeded");
+            yDebugNoFw("shmem receiver open succeeded");
         } else {
             yErrorNoFw("shmem receiver open failed");
             perror("recv open");
@@ -89,7 +88,7 @@ int ShmemTwoWayStream::accept() {
 
     result = acceptor.accept(stream);
     if (result>=0) {
-        YARP_DEBUG(Logger::get(),"shmem receiver accept succeeded");
+        yDebugNoFw("shmem receiver accept succeeded");
         happy = true;
     } else {
         yErrorNoFw("shmem receiver accept failed");
@@ -126,7 +125,7 @@ int ShmemTwoWayStream::read(const Bytes& b) {
         int result = stream.recv_n(base,len);
         if (result<=0) {
             happy = false;
-            YARP_DEBUG(Logger::get(),"bad socket read");
+            yDebugNoFw("bad socket read");
             total = -1;
             yErrorNoFw("shmem read failed");
             return -1;
@@ -151,7 +150,7 @@ void ShmemTwoWayStream::write(const Bytes& b) {
         int result = stream.send_n(base,len);
         if (result<0) {
             happy = false;
-            YARP_DEBUG(Logger::get(),"bad socket write");
+            yDebugNoFw("bad socket write");
             yErrorNoFw("shmem write failed");
             return;
         }

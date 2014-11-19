@@ -91,7 +91,7 @@ Contact NameServer::registerName(const String& name,
     bool reusablePort = false;
     bool reusableIp = false;
 
-    //YARP_DEBUG(Logger::get(),"in registerName...");
+    //yDebugNoFw("in registerName...");
 
     if (name!="...") {
         unregisterName(name);
@@ -142,8 +142,9 @@ Contact NameServer::registerName(const String& name,
 
     suggestion = Contact::bySocket(carrier,machine,port).addName(portName);
 
-    YARP_DEBUG(Logger::get(),String("Registering ") +
-               suggestion.toURI() + " for " + suggestion.getRegName());
+    yDebugNoFw("Registering %s for %s",
+               suggestion.toURI().c_str(),
+               suggestion.getRegName().c_str());
 
     NameRecord& nameRecord = getNameRecord(suggestion.getRegName());
     nameRecord.setAddress(suggestion,reusablePort,reusableIp);
@@ -166,8 +167,10 @@ Contact NameServer::queryName(const String& name) {
         if (patEnd>=patStart && patEnd!=String::npos) {
             pat = name.substr(patStart,patEnd-patStart);
             base = name.substr(patEnd);
-            YARP_DEBUG(Logger::get(),String("Special query form ") +
-                       name + " (" + pat + "/" + base + ")");
+            yDebugNoFw("Special query form %s (%s/%s)",
+                       name.c_str(),
+                       pat.c_str(),
+                       base.c_str());
         }
     }
 
@@ -296,9 +299,7 @@ String NameServer::cmdRegister(int argc, char *argv[]) {
                                    Contact::bySocket(carrier,machine,port).addName(portName),
                                    remote);
 
-    //YARP_DEBUG(Logger::get(),
-    //String("name server register address -- ") +
-    //address.toString());
+    //yDebugNoFw("name server register address -- %s", address.toString().c_str());
 
     return terminate(textify(address));
 }
@@ -706,7 +707,7 @@ String NameServer::apply(const String& txt, const Contact& remote) {
     SplitString ss(txt.c_str());
     if (ss.size()>=2) {
         String key = ss.get(1);
-        //YARP_DEBUG(Logger::get(),String("dispatching to ") + key);
+        //yDebugNoFw("dispatching to %s", key.c_str());
         ss.set(1,remote.getHost().c_str());
         result = dispatcher.dispatch(this,key.c_str(),ss.size()-1,
                                      (char **)(ss.get()+1));
@@ -719,8 +720,8 @@ String NameServer::apply(const String& txt, const Contact& remote) {
                 result = terminate(result);
             }
         }
-        //YARP_DEBUG(Logger::get(), String("name server request -- ") + txt);
-        //YARP_DEBUG(Logger::get(), String("name server result  -- ") + result);
+        //yDebugNoFw("name server request -- %s", txt.c_str());
+        //yDebugNoFw("name server result  -- %s", result.c_str());
     }
     mutex.post();
     return result;
@@ -769,15 +770,12 @@ public:
             msg = ref + msg;
         }
         if (reader.isActive()&&haveMessage) {
-            YARP_DEBUG(Logger::get(),String("name server got message ") + msg);
+            yDebugNoFw("name server got message %s", msg.c_str());
             size_t index = msg.find("NAME_SERVER");
             if (index==0) {
                 Contact remote = reader.getRemoteContact();
-                YARP_DEBUG(Logger::get(),
-                           String("name server receiving from ") +
-                           remote.toURI());
-                YARP_DEBUG(Logger::get(),
-                           String("name server request is ") + msg);
+                yDebugNoFw("name server receiving from %s", remote.toURI().c_str());
+                yDebugNoFw("name server request is %s", msg.c_str());
                 String result = server->apply(msg,remote);
                 ConnectionWriter *os = reader.getWriter();
                 if (os!=NULL) {
@@ -796,8 +794,7 @@ public:
                     tmp += '\r';
                     os->appendString(tmp.c_str(),'\n');
 
-                    YARP_DEBUG(Logger::get(),
-                               String("name server reply is ") + result);
+                    yDebugNoFw("name server reply is %s", result.c_str());
                     String resultSparse = result;
                     size_t end = resultSparse.find("\n*** end of message");
                     if (end!=String::npos) {
@@ -935,8 +932,7 @@ int NameServer::main(int argc, char *argv[]) {
     bool ok = server.open(suggest.addName(conf.getNamespace()),
                           false);
     if (ok) {
-        YARP_DEBUG(Logger::get(), String("Name server listening at ") +
-                   suggest.toURI());
+        yDebugNoFw("Name server listening at %s", suggest.toURI().c_str());
 
         YARP_SPRINTF2(Logger::get(),info,
                       "Name server can be browsed at http://%s:%d/",
@@ -952,7 +948,7 @@ int NameServer::main(int argc, char *argv[]) {
 #endif
 
         while (true) {
-            YARP_DEBUG(Logger::get(),"name server running happily");
+            yDebugNoFw("name server running happily");
             Time::delay(60);
         }
         server.close();

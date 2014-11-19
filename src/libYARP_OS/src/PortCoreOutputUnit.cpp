@@ -200,7 +200,7 @@ void PortCoreOutputUnit::closeBasic() {
 void PortCoreOutputUnit::closeMain() {
     if (finished) return;
 
-    YARP_DEBUG(Logger::get(),"PortCoreOutputUnit closing");
+    yDebugNoFw("PortCoreOutputUnit closing");
 
     if (running) {
         // give a kick (unfortunately unavoidable)
@@ -215,14 +215,14 @@ void PortCoreOutputUnit::closeMain() {
         join();
     }
 
-    YARP_DEBUG(Logger::get(),"PortCoreOutputUnit internal join");
+    yDebugNoFw("PortCoreOutputUnit internal join");
 
     closeBasic();
     running = false;
     closing = false;
     finished = true;
 
-    YARP_DEBUG(Logger::get(),"PortCoreOutputUnit closed");
+    yDebugNoFw("PortCoreOutputUnit closed");
 }
 
 
@@ -349,9 +349,9 @@ void *PortCoreOutputUnit::send(yarp::os::PortWriter& writer,
         if (running == false) {
             // we must have a thread if we're going to be skipping waits
             threaded = true;
-            YARP_DEBUG(Logger::get(),"starting a thread for output");
+            yDebugNoFw("starting a thread for output");
             start();
-            YARP_DEBUG(Logger::get(),"started a thread for output");
+            yDebugNoFw("started a thread for output");
         }
     }
 
@@ -377,8 +377,7 @@ void *PortCoreOutputUnit::send(yarp::os::PortWriter& writer,
             trackerMutex.post();
         }
     } else {
-        YARP_DEBUG(Logger::get(),
-                   "skipping connection tagged as sending something");
+        yDebugNoFw("skipping connection tagged as sending something");
     }
 
     if (waitAfter) {
