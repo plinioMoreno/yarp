@@ -396,7 +396,7 @@ bool Protocol::write(SizedWriter& writer) {
     if (reply!=NULL) {
         if (!delegate->supportReply()) {
             // We are expected to get a reply, but cannot.
-            YARP_INFO(log,String("connection ") + getRoute().toString() + " does not support replies (try \"tcp\" or \"text_ack\")");
+            yInfoNoFw("connection %s does not support replies (try \"tcp\" or \"text_ack\")", getRoute().toString().c_str());
         }
         if (ok) {
             // Read reply.

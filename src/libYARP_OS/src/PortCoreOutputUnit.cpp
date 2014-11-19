@@ -108,7 +108,7 @@ void PortCoreOutputUnit::runSingleThreaded() {
             route.getCarrierName();
         if (Name(route.getToName()).isRooted()) {
             if (Name(route.getFromName()).isRooted()) {
-                YARP_INFO(Logger::get(),msg);
+                yInfoNoFw("%s", msg.c_str());
             }
         }
 
@@ -161,7 +161,7 @@ void PortCoreOutputUnit::closeBasic() {
 
         if (Name(route.getToName()).isRooted()) {
             if (Name(route.getFromName()).isRooted()) {
-                YARP_INFO(Logger::get(), msg);
+                yInfoNoFw("%s", msg.c_str());
             }
         }
 

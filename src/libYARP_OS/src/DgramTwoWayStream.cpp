@@ -193,18 +193,15 @@ void DgramTwoWayStream::allocate(int readSize, int writeSize) {
         if (sz!=0) {
             _read_size = _write_size = sz;
         }
-        YARP_INFO(Logger::get(),String("Datagram packet size set to ") +
-                  NetType::toString(_read_size));
+        yInfoNoFw("Datagram packet size set to %d", _read_size);
     }
     if (readSize!=0) {
         _read_size = readSize;
-        YARP_INFO(Logger::get(),String("Datagram read size reset to ") +
-                  NetType::toString(_read_size));
+        yInfoNoFw("Datagram read size reset to %d", _read_size);
     }
     if (writeSize!=0) {
         _write_size = writeSize;
-        YARP_INFO(Logger::get(),String("Datagram write size reset to ") +
-                  NetType::toString(_write_size));
+        yInfoNoFw("Datagram write size reset to %d", _write_size);
     }
     readBuffer.allocate(_read_size);
     writeBuffer.allocate(_write_size);
@@ -262,8 +259,7 @@ int DgramTwoWayStream::restrictMcast(ACE_SOCK_Dgram_Mcast * dmcast,
                                      bool add) {
     restrictInterfaceIp = ipLocal;
 
-    YARP_INFO(Logger::get(),
-              String("multicast connection ") + group.getHost() + " on network interface for " + ipLocal.getHost());
+    yInfoNoFw("multicast connection %s on network interface for  %s", group.getHost().c_str(), ipLocal.getHost().c_str());
     int result = -1;
     // There's some major damage in ACE mcast interfaces.
     // Most require interface names, yet provide no way to query
@@ -608,18 +604,13 @@ YARP_SSIZE_T DgramTwoWayStream::read(const Bytes& b) {
                 if (!crcOk) {
                     if (bufferAlertNeeded&&!bufferAlerted) {
                         yErrorNoFw("*** Multicast/UDP packet dropped - checksum error ***");
-                        YARP_INFO(Logger::get(),
-                                  "The UDP/MCAST system buffer limit on your system is low.");
-                        YARP_INFO(Logger::get(),
-                                  "You may get packet loss under heavy conditions.");
+                        yInfoNoFw("The UDP/MCAST system buffer limit on your system is low.");
+                        yInfoNoFw("You may get packet loss under heavy conditions.");
 #ifdef __linux__
-                        YARP_INFO(Logger::get(),
-                                  "To change the buffer limit on linux: sysctl -w net.core.rmem_max=8388608");
-                        YARP_INFO(Logger::get(),
-                                  "(Might be something like: sudo /sbin/sysctl -w net.core.rmem_max=8388608)");
+                        yInfoNoFw("To change the buffer limit on linux: sysctl -w net.core.rmem_max=8388608");
+                        yInfoNoFw("(Might be something like: sudo /sbin/sysctl -w net.core.rmem_max=8388608)");
 #else
-                        YARP_INFO(Logger::get(),
-                                  "To change the limit use: systcl for Linux/FreeBSD, ndd for Solaris, no for AIX");
+                        yInfoNoFw("To change the limit use: systcl for Linux/FreeBSD, ndd for Solaris, no for AIX");
 #endif
                         bufferAlerted = true;
                     } else {

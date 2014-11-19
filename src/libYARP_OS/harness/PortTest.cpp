@@ -323,8 +323,7 @@ public:
             checkTrue(result!=NULL,"got something check");
             if (result!=NULL) {
                 checkEqual(bot1.size(),result->size(),"size check");
-                YARP_INFO(Logger::get(),String("size is in fact ") +
-                          NetType::toString(result->size()));
+                yInfoNoFw("size is in fact %d", result->size());
             }
         }
 
@@ -363,8 +362,7 @@ public:
             checkTrue(result!=NULL,"got something check");
             if (result!=NULL) {
                 checkEqual(bot1.size(),result->size(),"size check");
-                YARP_INFO(Logger::get(),String("size is in fact ") +
-                          NetType::toString(result->size()));
+                yInfoNoFw("size is in fact %d", result->size());
             }
         }
         if (ct==0) {
@@ -411,8 +409,7 @@ public:
             checkTrue(result!=NULL,"got something check");
             if (result!=NULL) {
                 checkEqual(bot1.size(),result->size(),"size check");
-                YARP_INFO(Logger::get(),String("size is in fact ") +
-                          NetType::toString(result->size()));
+                yInfoNoFw("size is in fact %d", result->size());
             }
         }
         if (ct==0) {

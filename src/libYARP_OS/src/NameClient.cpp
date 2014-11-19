@@ -176,14 +176,14 @@ String NameClient::send(const String& cmd, bool multi) {
             retried = true;
         }
         if (ip==NULL) {
-            YARP_INFO(Logger::get(),"No connection to nameserver");
+            yInfoNoFw("No connection to nameserver");
             if (!allowScan) {
-                YARP_INFO(Logger::get(),"*** try running: yarp detect ***");
+                yInfoNoFw("*** try running: yarp detect ***");
             }
             Contact alt;
             if (!isFakeMode()) {
                 if (allowScan) {
-                    YARP_INFO(Logger::get(),"no connection to nameserver, scanning mcast");
+                    yInfoNoFw("no connection to nameserver, scanning mcast");
                     reportScan = true;
 #ifdef YARP_HAS_ACE
                     alt = FallbackNameClient::seek();

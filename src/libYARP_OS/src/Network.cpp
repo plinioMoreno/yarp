@@ -607,8 +607,7 @@ void NetworkBase::initMinimum() {
             ConstString verbose = getEnvironment("YARP_VERBOSE");
             Bottle b(verbose.c_str());
             if (b.get(0).asInt()>0) {
-                YARP_INFO(Logger::get(),
-                          "YARP_VERBOSE environment variable is set");
+                yInfoNoFw("YARP_VERBOSE environment variable is set");
                 Logger::get().setVerbosity(b.get(0).asInt());
             }
         }

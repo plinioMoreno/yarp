@@ -614,15 +614,9 @@ bool Port::open(const Contact& contact, bool registerName,
 
         if (core.getVerbosity()>=1) {
             if (address.getRegName()=="") {
-                YARP_INFO(Logger::get(),
-                          String("Anonymous port active at ") +
-                          address.toURI());
+                yInfoNoFw("Anonymous port active at %s", address.toURI().c_str());
             } else {
-                YARP_INFO(Logger::get(),
-                          String("Port ") +
-                          address.getRegName() +
-                          " active at " +
-                          address.toURI());
+                yInfoNoFw("Port %s active at %s", address.getRegName().c_str(), address.toURI().c_str());
             }
         }
     }

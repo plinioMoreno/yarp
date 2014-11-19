@@ -109,7 +109,7 @@ void PortCoreInputUnit::run() {
                 route.getCarrierName();
             if (Name(route.getFromName()).isRooted()) {
                 if (reversed||ip->getConnection().isPush()) {
-                    YARP_INFO(Logger::get(),msg);
+                    yInfoNoFw("%s", msg.c_str());
                     posted = true;
                 } else {
                     YARP_DEBUG(Logger::get(),msg);
@@ -373,7 +373,7 @@ void PortCoreInputUnit::run() {
 
         if (Name(route.getFromName()).isRooted()) {
             if (posted) {
-                YARP_INFO(Logger::get(),msg);
+                yInfoNoFw("%s", msg.c_str());
             }
         } else {
             YARP_DEBUG(Logger::get(),"PortCoreInputUnit (unrooted) shutting down");

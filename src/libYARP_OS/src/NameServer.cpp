@@ -803,11 +803,10 @@ public:
                     if (end!=String::npos) {
                         resultSparse[end] = '\0';
                     }
-                    YARP_INFO(Logger::get(),resultSparse);
+                    yInfoNoFw("%s", resultSparse.c_str());
                 }
             } else {
-                YARP_INFO(Logger::get(),
-                          String("Name server ignoring unknown command: ")+msg);
+                yInfoNoFw("Name server ignoring unknown command: %s", msg.c_str());
                 ConnectionWriter *os = reader.getWriter();
                 if (os!=NULL) {
                     // this result is necessary for YARP1 support
@@ -915,7 +914,7 @@ int NameServer::main(int argc, char *argv[]) {
 
     // finally, should make sure IP is local, and if not, correct it
     if (!conf.isLocalName(suggest.getHost())) {
-        YARP_INFO(Logger::get(),"Overriding non-local address for name server");
+        yInfoNoFw("Overriding non-local address for name server");
         suggest = Contact(conf.getHostName(),suggest.getPort());
     }
 
@@ -949,8 +948,7 @@ int NameServer::main(int argc, char *argv[]) {
 
         // register fallback root for documentation purposes
         name.registerName("fallback",FallbackNameServer::getAddress());
-        YARP_INFO(Logger::get(), String("Bootstrap server listening at ") +
-                  FallbackNameServer::getAddress().toURI());
+        yInfoNoFw("Bootstrap server listening at %s", FallbackNameServer::getAddress().toURI().c_str());
 #endif
 
         while (true) {

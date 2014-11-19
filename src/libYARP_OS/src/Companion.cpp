@@ -1285,22 +1285,20 @@ public:
 
 
 int Companion::cmdCheck(int argc, char *argv[]) {
-    Logger& log = Logger::get();
-
-    YARP_INFO(log,"==================================================================");
-    YARP_INFO(log,"=== This is \"yarp check\"");
-    YARP_INFO(log,"=== It is a very simple sanity check for your installation");
-    YARP_INFO(log,"=== If it freezes, try deleting the file reported by \"yarp conf\"");
-    YARP_INFO(log,"=== Also, if you are mixing terminal types, e.g. bash/cmd.exe");
-    YARP_INFO(log,"=== on windows, make sure the \"yarp conf\" file is the same on each");
-    YARP_INFO(log,"==================================================================");
-    YARP_INFO(log,"=== Trying to register some ports");
+    yInfoNoFw("==================================================================");
+    yInfoNoFw("=== This is \"yarp check\"");
+    yInfoNoFw("=== It is a very simple sanity check for your installation");
+    yInfoNoFw("=== If it freezes, try deleting the file reported by \"yarp conf\"");
+    yInfoNoFw("=== Also, if you are mixing terminal types, e.g. bash/cmd.exe");
+    yInfoNoFw("=== on windows, make sure the \"yarp conf\" file is the same on each");
+    yInfoNoFw("==================================================================");
+    yInfoNoFw("=== Trying to register some ports");
 
     CompanionCheckHelper check;
     Port in;
     bool faking = false;
     if (!NetworkBase::exists(NetworkBase::getNameServerName())) {
-        YARP_INFO(log,"=== NO NAME SERVER!  Switching to local, fake mode");
+        yInfoNoFw("=== NO NAME SERVER!  Switching to local, fake mode");
         NetworkBase::setLocalMode(true);
         faking = true;
     }
@@ -1311,15 +1309,15 @@ int Companion::cmdCheck(int argc, char *argv[]) {
 
     Time::delay(1);
 
-    YARP_INFO(log,"==================================================================");
-    YARP_INFO(log,"=== Trying to connect some ports");
+    yInfoNoFw("==================================================================");
+    yInfoNoFw("=== Trying to connect some ports");
 
     connect(out.getName().c_str(),in.getName().c_str());
 
     Time::delay(1);
 
-    YARP_INFO(log,"==================================================================");
-    YARP_INFO(log,"=== Trying to write some data");
+    yInfoNoFw("==================================================================");
+    yInfoNoFw("=== Trying to write some data");
 
     Bottle bot;
     bot.addInt(42);
@@ -1327,36 +1325,36 @@ int Companion::cmdCheck(int argc, char *argv[]) {
 
     Time::delay(1);
 
-    YARP_INFO(log,"==================================================================");
+    yInfoNoFw("==================================================================");
     bool ok = false;
     for (int i=0; i<3; i++) {
-        YARP_INFO(log,"=== Trying to read some data");
+        yInfoNoFw("=== Trying to read some data");
         Time::delay(1);
         if (check.get()!=NULL) {
             int x = check.get()->getInt(0);
             char buf[256];
             ACE_OS::sprintf(buf, "*** Read number %d", x);
-            YARP_INFO(log,buf);
+            yInfoNoFw(buf);
             if (x==42) {
                 ok = true;
                 break;
             }
         }
     }
-    YARP_INFO(log,"==================================================================");
-    YARP_INFO(log,"=== Trying to close some ports");
+    yInfoNoFw("==================================================================");
+    yInfoNoFw("=== Trying to close some ports");
     in.close();
     out.close();
     Time::delay(1);
     if (!ok) {
-        YARP_INFO(log,"*** YARP seems broken.");
+        yInfoNoFw("*** YARP seems broken.");
         //diagnose();
         return 1;
     } else {
         if (faking) {
-            YARP_INFO(log,"*** YARP seems okay, but there is no name server available.");
+            yInfoNoFw("*** YARP seems okay, but there is no name server available.");
         } else {
-            YARP_INFO(log,"*** YARP seems okay!");
+            yInfoNoFw("*** YARP seems okay!");
         }
     }
     return 0;
