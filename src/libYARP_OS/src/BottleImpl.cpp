@@ -381,7 +381,7 @@ bool BottleImpl::fromBytes(ConnectionReader& reader) {
     }
     Storable *storable = Storable::createByCode(id);
     if (storable==NULL) {
-        YARP_SPRINTF1(Logger::get(),error,"BottleImpl reader failed, unrecognized object code %d",id);
+        yErrorNoFw("BottleImpl reader failed, unrecognized object code %d", id);
         return false;
     }
     storable->readRaw(reader);

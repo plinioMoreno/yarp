@@ -67,8 +67,7 @@ void UnitTest::report(int severity, const String& problem) {
     if (parent!=NULL) {
         parent->report(severity, getName() + ": " + problem);
     } else {
-        YARP_SPRINTF2(Logger::get(),info,
-                      "%d | %s", severity, problem.c_str());
+        yInfoNoFw("%d | %s", severity, problem.c_str());
     }
     count(severity);
 }

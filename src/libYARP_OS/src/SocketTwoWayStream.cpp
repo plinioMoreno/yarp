@@ -52,11 +52,9 @@ int SocketTwoWayStream::open(const Contact& address) {
     if (result>=0) {
         happy = true;
     } else {
-        YARP_SPRINTF2(Logger::get(),
-                      debug,
-                      "TCP connection to tcp://%s:%d failed to open",
-                      host.c_str(),
-                      address.getPort());
+        yDebugNoFw("TCP connection to tcp://%s:%d failed to open",
+                   host.c_str(),
+                   address.getPort());
     }
     updateAddresses();
     return result;

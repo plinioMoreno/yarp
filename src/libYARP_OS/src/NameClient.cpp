@@ -233,9 +233,7 @@ String NameClient::send(const String& cmd, bool multi) {
         }
         ip->close();
         delete ip;
-        YARP_SPRINTF1(Logger::get(),
-                      debug,
-                      "<<< received from nameserver: %s",result.c_str());
+        yDebugNoFw("<<< received from nameserver: %s", result.c_str());
     } while (retry&&!retried);
 
     return (result + "\n");

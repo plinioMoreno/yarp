@@ -440,9 +440,7 @@ bool Port::open(const Contact& contact, bool registerName,
     }
     if (n!="" && n[0]!='/'  && n[0]!='=' && n!="..." && n.substr(0,3)!="...") {
         if (fakeName==NULL) {
-            YARP_SPRINTF1(Logger::get(),error,
-                          "Port name '%s' needs to start with a '/' character",
-                          n.c_str());
+            yErrorNoFw("Port name '%s' needs to start with a '/' character", n.c_str());
             return false;
         }
     }
@@ -476,22 +474,14 @@ bool Port::open(const Contact& contact, bool registerName,
                                                 "@" +
                                                 nc.getNodeName());
                 } else {
-                    YARP_SPRINTF1(Logger::get(),error,
-                                  "Error: Port '%s' is not committed to being either an input or output port.",
-                                  n.c_str());
-                    YARP_SPRINTF0(Logger::get(),error,
-                                  "YARP does not mind, but we are trying to register with a name server that does.");
-                    YARP_SPRINTF0(Logger::get(),error,
-                                  "You can call Port::setWriteOnly() or Port::setReadOnly(), OR rename the port.");
+                    yErrorNoFw("Error: Port '%s' is not committed to being either an input or output port.", n.c_str());
+                    yErrorNoFw("YARP does not mind, but we are trying to register with a name server that does.");
+                    yErrorNoFw("You can call Port::setWriteOnly() or Port::setReadOnly(), OR rename the port.");
                     NestedContact nc2 = nc;
                     nc2.setCategoryWrite();
-                    YARP_SPRINTF1(Logger::get(),error,
-                                  "For an output port, call it: %s (+ adds data)",
-                                  nc2.toString().c_str());
+                    yErrorNoFw("For an output port, call it: %s (+ adds data)", nc2.toString().c_str());
                     nc2.setCategoryRead();
-                    YARP_SPRINTF1(Logger::get(),error,
-                                  "For an input port, call it: %s (- takes data)",
-                                  nc2.toString().c_str());
+                    yErrorNoFw("For an input port, call it: %s (- takes data)", nc2.toString().c_str());
                     return false;
                 }
             }

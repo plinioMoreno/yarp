@@ -137,9 +137,7 @@ public:
                 spaces.push_back(ns);
             } else {
                 // shrug
-                YARP_SPRINTF1(Logger::get(),error,
-                              "cannot deal with namespace of type %s",
-                              mode.c_str());
+                yErrorNoFw("cannot deal with namespace of type %s", mode.c_str());
                 return false;
             }
         }

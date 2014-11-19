@@ -226,10 +226,7 @@ bool AbstractCarrier::defaultExpectAck(ConnectionState& proto) {
 bool AbstractCarrier::defaultExpectIndex(ConnectionState& proto) {
     Log& log = proto.getLog();
     yDebugNoFw("expecting an index");
-    YARP_SPRINTF1(Logger::get(),
-                  debug,
-                  "ConnectionState::expectIndex for %s", 
-                  proto.getRoute().toString().c_str());
+    yDebugNoFw("ConnectionState::expectIndex for %s", proto.getRoute().toString().c_str());
     // expect index header
     char buf[8];
     Bytes header((char*)&buf[0],sizeof(buf));
@@ -283,10 +280,7 @@ bool AbstractCarrier::defaultExpectIndex(ConnectionState& proto) {
         total += x;
     }
     proto.setRemainingLength(total);
-    YARP_SPRINTF1(Logger::get(),
-                  debug,
-                  "Total message length: %d",
-                  total);
+    yDebugNoFw("Total message length: %d", total);
     return true;
 }
 

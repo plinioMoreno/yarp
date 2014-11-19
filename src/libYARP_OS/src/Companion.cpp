@@ -348,9 +348,7 @@ int Companion::dispatch(const char *name, int argc, char *argv[]) {
     char **argv_copy_org = argv_copy;
     int argc_copy = argc;
     if (!argv_copy) {
-        YARP_SPRINTF0(Logger::get(),
-                      error,
-                      "Could not copy argument list");
+        yErrorNoFw("Could not copy argument list");
         return 1;
     }
     int at = 0;
@@ -387,9 +385,7 @@ int Companion::dispatch(const char *name, int argc, char *argv[]) {
     if (result!=-1) {
         v = (this->*(e.fn))(argc_copy,argv_copy);
     } else {
-        YARP_SPRINTF1(Logger::get(),
-                      error,
-                      "Could not find command \"%s\"",name);
+        yErrorNoFw("Could not find command \"%s\"", name);
     }
     delete[] argv_copy_org;
     return v;
@@ -637,11 +633,9 @@ int Companion::wait(const char *target, bool silent, const char *target2) {
         if (ct%30==1) {
             if (!silent) {
                 if (target2!=NULL) {
-                    YARP_SPRINTF2(Logger::get(),info,
-                                  "Waiting for %s->%s...", target, target2);
+                    yInfoNoFw("Waiting for %s->%s...", target, target2);
                 } else {
-                    YARP_SPRINTF1(Logger::get(),info,
-                                  "Waiting for %s...", target);
+                    yInfoNoFw("Waiting for %s...", target);
                 }
             }
         }
@@ -973,7 +967,7 @@ int Companion::sendMessage(const String& port, PortWriter& writable,
     output = b.toString().c_str();
     if (!quiet) {
         //ACE_OS::fprintf(stderr,"%s\n", b.toString().c_str());
-        YARP_SPRINTF1(Logger::get(),info,"%s", b.toString().c_str());
+        yInfoNoFw("%s", b.toString().c_str());
     }
     ip.endRead();
     out->close();

@@ -74,9 +74,7 @@ static bool checkForCarrier(const Bytes *header, Searchable& group) {
 }
 
 static bool scanForCarrier(const Bytes *header) {
-    YARP_SPRINTF0(Logger::get(),
-                  debug,
-                  "Scanning for a carrier by header.");
+    yDebugNoFw("Scanning for a carrier by header.");
     YarpPluginSelector selector;
     selector.scan();
     Bottle lst = selector.getSelectedPlugins();
@@ -181,15 +179,9 @@ Carrier *Carriers::chooseCarrier(const String *name, const Bytes *header,
         }
         txt += "]";
 
-        YARP_SPRINTF1(Logger::get(),
-                      error,
-                      "Could not find carrier for a connection starting with: %s",
-                      txt.c_str());
+        yErrorNoFw("Could not find carrier for a connection starting with: %s", txt.c_str());
     } else {
-        YARP_SPRINTF1(Logger::get(),
-                      error,
-                      "Could not find carrier \"%s\"",
-                      (name!=NULL)?name->c_str():"[bytes]");;
+        yErrorNoFw("Could not find carrier \"%s\"", (name!=NULL) ? name->c_str() : "[bytes]");;
     }
     return NULL;
 }

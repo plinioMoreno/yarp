@@ -45,16 +45,13 @@ bool YarpPluginSettings::open(SharedLibraryFactory& factory,
 bool YarpPluginSettings::subopen(SharedLibraryFactory& factory, 
                                  const ConstString& dll_name,
                                  const ConstString& fn_name) {
-    YARP_SPRINTF2(impl::Logger::get(),debug,"Trying plugin [dll: %s] [fn: %s]",
-                  dll_name.c_str(),fn_name.c_str());
+    yDebugNoFw("Trying plugin [dll: %s] [fn: %s]", dll_name.c_str(), fn_name.c_str());
     bool ok = factory.open(dll_name.c_str(),fn_name.c_str());
     if (verbose) {
         fprintf(stderr,"Trying to find library '%s' containing function '%s' -- %s\n", dll_name.c_str(), fn_name.c_str(), ok?"found":"not found");
     }
     if (ok) {
-        YARP_SPRINTF2(impl::Logger::get(),debug,
-                      "Found plugin [dll: %s] [fn: %s]",
-                      dll_name.c_str(),fn_name.c_str());
+        yDebugNoFw("Found plugin [dll: %s] [fn: %s]", dll_name.c_str(), fn_name.c_str());
         this->dll_name = dll_name;
         this->fn_name = fn_name;
     }
@@ -62,8 +59,7 @@ bool YarpPluginSettings::subopen(SharedLibraryFactory& factory,
 }
 
 bool YarpPluginSettings::open(SharedLibraryFactory& factory) {
-    YARP_SPRINTF3(impl::Logger::get(),debug,"Plugin [name: %s] [dll: %s] [fn: %s]",
-                  name.c_str(),dll_name.c_str(),fn_name.c_str());
+    yDebugNoFw("Plugin [name: %s] [dll: %s] [fn: %s]", name.c_str(), dll_name.c_str(), fn_name.c_str());
     if (selector!=NULL && name != "") {
         // we may have a YARP-specific search path available,
         // and a proper name for the DLL
@@ -130,9 +126,7 @@ void YarpPluginSelector::scan() {
         }
     }
     if (need_scan) {
-        YARP_SPRINTF0(Logger::get(),
-                      debug,
-                      "Scanning. I'm scanning. I hope you like scanning too.");
+        yDebugNoFw("Scanning. I'm scanning. I hope you like scanning too.");
         NetworkBase::lock();
         ResourceFinder& rf = ResourceFinder::getResourceFinderSingleton();
         if (!rf.isConfigured()) {
@@ -146,15 +140,11 @@ void YarpPluginSelector::scan() {
         if (plugins.size()>0) {
             for (int i=0; i<plugins.size(); i++) {
                 ConstString target = plugins.get(i).asString();
-                YARP_SPRINTF1(Logger::get(),
-                              debug,
-                              "Loading configuration files related to plugins from %s.", target.c_str());
+                yDebugNoFw("Loading configuration files related to plugins from %s.", target.c_str());
                 config.fromConfigFile(target,false);
             }
         } else {
-            YARP_SPRINTF0(Logger::get(),
-                          debug,
-                          "Plugin directory not found");
+            yDebugNoFw("Plugin directory not found");
         }
         config.put("last_update_time",Time::now());
         state = config;

@@ -154,8 +154,7 @@ static int enactConnection(const Contact& src,
         cmd.addVocab(Vocab::encode("list"));
         cmd.addVocab(Vocab::encode(reversed?"in":"out"));
         cmd.addString(dest.getName().c_str());
-        YARP_SPRINTF2(Logger::get(),debug,"asking %s: %s",
-                      src.toString().c_str(), cmd.toString().c_str());
+        yDebugNoFw("asking %s: %s", src.toString().c_str(), cmd.toString().c_str());
         bool ok = NetworkBase::write(src,cmd,reply,rpc);
         if (!ok) {
             noteDud(src);
@@ -193,13 +192,11 @@ static int enactConnection(const Contact& src,
         c2 = NetworkBase::queryName(c2.getName());
     }
     if (c2.getCarrier()!="tcp") {
-        YARP_SPRINTF2(Logger::get(),debug,"would have asked %s: %s",
-                      src.toString().c_str(), cmd.toString().c_str());
+        yDebugNoFw("would have asked %s: %s", src.toString().c_str(), cmd.toString().c_str());
         return 1;
     }
 
-    YARP_SPRINTF2(Logger::get(),debug,"** asking %s: %s",
-                  src.toString().c_str(), cmd.toString().c_str());
+    yDebugNoFw("** asking %s: %s", src.toString().c_str(), cmd.toString().c_str());
     bool ok = NetworkBase::write(c2,cmd,reply,rpc);
     if (!ok) {
         noteDud(src);
@@ -252,12 +249,10 @@ static int metaConnect(const ConstString& src,
                        const ConstString& dest,
                        ContactStyle style,
                        int mode) {
-    YARP_SPRINTF3(Logger::get(),debug,
-                  "working on connection %s to %s (%s)",
-                  src.c_str(),
-                  dest.c_str(),
-                  (mode==YARP_ENACT_CONNECT)?"connect":((mode==YARP_ENACT_DISCONNECT)?"disconnect":"check")
-                  );
+    yDebugNoFw("working on connection %s to %s (%s)",
+               src.c_str(),
+               dest.c_str(),
+               (mode==YARP_ENACT_CONNECT)?"connect":((mode==YARP_ENACT_DISCONNECT)?"disconnect":"check"));
 
     // get the expressed contacts, without name server input
     Contact dynamicSrc = Contact::fromString(src);
@@ -615,8 +610,7 @@ void NetworkBase::initMinimum() {
         if (stack!="") {
             int sz = atoi(stack.c_str());
             Thread::setDefaultStackSize(sz);
-            YARP_SPRINTF1(Logger::get(), info,
-                          "YARP_STACK_SIZE set to %d", sz);
+            yInfoNoFw("YARP_STACK_SIZE set to %d", sz);
         }
         ConstString clock = getEnvironment("YARP_CLOCK");
         if (clock!="") {
@@ -652,9 +646,9 @@ void NetworkBase::finiMinimum() {
 }
 
 Contact NetworkBase::queryName(const ConstString& name) {
-    YARP_SPRINTF1(Logger::get(),debug,"query name %s",name.c_str());
+    yDebugNoFw("query name %s", name.c_str());
     if (getNameServerName()==name) {
-        YARP_SPRINTF1(Logger::get(),debug,"query recognized as name server: %s",name.c_str());
+        yDebugNoFw("query recognized as name server: %s", name.c_str());
         return getNameServerContact();
     }
     Contact c = c.fromString(name);
@@ -666,14 +660,13 @@ Contact NetworkBase::queryName(const ConstString& name) {
 
 
 Contact NetworkBase::registerName(const ConstString& name) {
-    YARP_SPRINTF1(Logger::get(),debug,"register name %s",name.c_str());
+    yDebugNoFw("register name %s", name.c_str());
     return getNameSpace().registerName(name);
 }
 
 
 Contact NetworkBase::registerContact(const Contact& contact) {
-    YARP_SPRINTF1(Logger::get(),debug,"register contact %s",
-                  contact.toString().c_str());
+    yDebugNoFw("register contact %s", contact.toString().c_str());
     return getNameSpace().registerContact(contact);
 }
 
@@ -768,9 +761,7 @@ bool NetworkBase::write(const Contact& contact,
     }
     if (!address.isValid()) {
         if (!style.quiet) {
-            YARP_SPRINTF1(Logger::get(),error,
-                          "cannot find port %s",
-                          targetName);
+            yErrorNoFw("cannot find port %s", targetName);
         }
         return false;
     }
@@ -781,9 +772,7 @@ bool NetworkBase::write(const Contact& contact,
     OutputProtocol *out = Carriers::connect(address);
     if (out==NULL) {
         if (!style.quiet) {
-            YARP_SPRINTF1(Logger::get(),error,
-                          "Cannot connect to port %s",
-                          targetName);
+            yErrorNoFw("Cannot connect to port %s", targetName);
         }
         return false;
     }
@@ -1206,9 +1195,9 @@ bool NetworkBase::registerCarrier(const char *name,const char *dll) {
     }
     if (!factory->isValid()) {
         if (dll!=NULL) {
-            YARP_SPRINTF2(Logger::get(),error,"Failed to find library %s with carrier %s", dll, name);
+            yErrorNoFw("Failed to find library %s with carrier %s", dll, name);
         } else {
-            YARP_SPRINTF1(Logger::get(),error,"Failed to find library support for carrier %s", name);
+            yErrorNoFw("Failed to find library support for carrier %s", name);
         }
         delete factory;
         factory = NULL;

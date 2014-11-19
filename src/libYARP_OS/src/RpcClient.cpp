@@ -24,7 +24,7 @@ RpcClient::~RpcClient() {
 }
 
 bool RpcClient::read(PortReader& reader, bool willReply) {
-    YARP_SPRINTF1(Logger::get(),error,"cannot read from RpcClient %s, please use a regular Port for that",port.getName().c_str());
+    yErrorNoFw("cannot read from RpcClient %s, please use a regular Port for that", port.getName().c_str());
     return false;
 }
 

@@ -189,18 +189,18 @@ Contact RosNameSpace::registerAdvanced(const Contact& contact, NameStore *store)
     if (pub_idx!=ConstString::npos) {
         node = name.substr(0,pub_idx);
         pub = name.substr(pub_idx+2,name.length());
-        YARP_SPRINTF1(Logger::get(),debug,"Publish to %s",pub.c_str());
+        yDebugNoFw("Publish to %s", pub.c_str());
     }
     if (sub_idx!=ConstString::npos) {
         node = name.substr(0,sub_idx);
         sub = name.substr(sub_idx+2,name.length());
-        YARP_SPRINTF1(Logger::get(),debug,"Subscribe to %s",sub.c_str());
+        yDebugNoFw("Subscribe to %s", sub.c_str());
     }
     if (node=="") {
         node = name;
     }
-    YARP_SPRINTF4(Logger::get(),debug,"Name [%s] Node [%s] sub [%s] pub [%s]",
-                  name.c_str(), node.c_str(), sub.c_str(), pub.c_str());
+    yDebugNoFw("Name [%s] Node [%s] sub [%s] pub [%s]",
+               name.c_str(), node.c_str(), sub.c_str(), pub.c_str());
 
     {
         Bottle cmd, reply;
@@ -293,8 +293,7 @@ Contact RosNameSpace::unregisterAdvanced(const ConstString& rname, NameStore *st
     if (node=="") {
         node = name;
     }
-    YARP_SPRINTF3(Logger::get(),debug,"Name [%s] sub [%s] pub [%s]\n",
-                  name.c_str(), sub.c_str(), pub.c_str());
+    yDebugNoFw("Name [%s] sub [%s] pub [%s]", name.c_str(), sub.c_str(), pub.c_str());
 
     if (pub!="") {
         NetworkBase::disconnect(full,ConstString("topic:/") + pub);

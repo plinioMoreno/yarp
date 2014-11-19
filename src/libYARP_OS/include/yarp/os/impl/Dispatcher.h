@@ -64,7 +64,7 @@ public:
         if (result!=-1) {
             return (owner->*(e.fn))(argc,argv);
         } else {
-            YARP_SPRINTF1(Logger::get(),error,"Could not find command \"%s\"",name);
+            yErrorNoFw("Could not find command \"%s\"", name);
         }
         return RET();
     }

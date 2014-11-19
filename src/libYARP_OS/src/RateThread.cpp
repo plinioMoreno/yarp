@@ -401,12 +401,9 @@ bool RateThreadWrapper::open(double framerate, bool polling) {
     int period = 0;
     if (framerate>0) {
         period=(int) (0.5+1000.0/framerate);
-        YARP_SPRINTF2(Logger::get(),info,
-                      "Setting framerate to: %.0lf[Hz] (thread period %d[ms])\n",
-                      framerate, period);
+        yInfoNoFw("Setting framerate to: %.0lf[Hz] (thread period %d[ms])", framerate, period);
     } else {
-        YARP_SPRINTF0(Logger::get(),info,
-                      "No framerate specified, polling the device");
+        yInfoNoFw("No framerate specified, polling the device");
         period=0; //continuous
     }
     RateThread::setRate(period);

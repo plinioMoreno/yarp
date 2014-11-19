@@ -934,9 +934,7 @@ int NameServer::main(int argc, char *argv[]) {
     if (ok) {
         yDebugNoFw("Name server listening at %s", suggest.toURI().c_str());
 
-        YARP_SPRINTF2(Logger::get(),info,
-                      "Name server can be browsed at http://%s:%d/",
-                      suggest.getHost().c_str(), suggest.getPort());
+        yInfoNoFw("Name server can be browsed at http://%s:%d/", suggest.getHost().c_str(), suggest.getPort());
 
 #ifdef YARP_HAS_ACE
         FallbackNameServer fallback(name);
