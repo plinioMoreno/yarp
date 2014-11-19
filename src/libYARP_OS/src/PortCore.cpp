@@ -1798,8 +1798,7 @@ bool PortCore::adminBlock(ConnectionReader& reader, void *id,
             // has been implemented, but is still needed for older
             // ways of interfacing with ROS without using dedicated
             // node ports.
-            YARP_SPRINTF1(log,debug,
-                          "publisherUpdate! --> %s", cmd.toString().c_str());
+            yCDebugNoFw("port", "publisherUpdate! --> %s", cmd.toString().c_str());
             ConstString topic =
                 RosNameSpace::fromRosName(cmd.get(2).asString());
             Bottle *pubs = cmd.get(3).asList();
@@ -1826,7 +1825,7 @@ bool PortCore::adminBlock(ConnectionReader& reader, void *id,
                 for (int i=0; i<pubs->size(); i++) {
                     ConstString pub = pubs->get(i).asString();
                     if (!present.check(pub)) {
-                        YARP_SPRINTF1(log,debug,"ROS ADD %s", pub.c_str());
+                        yCDebugNoFw("port", "ROS ADD %s", pub.c_str());
                         Bottle req, reply;
                         req.addString("requestTopic");
                         req.addString("dummy_id");
@@ -1834,9 +1833,7 @@ bool PortCore::adminBlock(ConnectionReader& reader, void *id,
                         Bottle& lst = req.addList();
                         Bottle& sublst = lst.addList();
                         sublst.addString("TCPROS");
-                        YARP_SPRINTF2(log,debug,
-                                      "Sending [%s] to %s", req.toString().c_str(),
-                                      pub.c_str());
+                        yCDebugNoFw("port", "Sending [%s] to %s", req.toString().c_str(), pub.c_str());
                         Contact c = Contact::fromString(pub.c_str());
                         if (!__pc_rpc(c,"xmlrpc",req,reply, false)) {
                             fprintf(stderr,"Cannot connect to ROS subscriber %s\n",
@@ -1863,10 +1860,10 @@ bool PortCore::adminBlock(ConnectionReader& reader, void *id,
                                 portnum = portnum2.asInt();
                                 carrier = "tcpros+role.pub+topic.";
                                 carrier += topic;
-                                YARP_SPRINTF3(log,debug,
-                                              "topic %s available at %s:%d",
-                                              topic.c_str(), hostname.c_str(),
-                                              portnum);
+                                yCDebugNoFw("port", "topic %s available at %s:%d",
+                                            topic.c_str(),
+                                            hostname.c_str(),
+                                            portnum);
                             }
                             if (portnum!=0) {
                                 Contact addr(hostname.c_str(),portnum);
@@ -1908,8 +1905,7 @@ bool PortCore::adminBlock(ConnectionReader& reader, void *id,
     case VOCAB4('r','t','o','p'):
         {
             // ROS-style query for topics.
-            YARP_SPRINTF1(log,debug,"requestTopic! --> %s",
-                          cmd.toString().c_str());
+            yCDebugNoFw("port", "requestTopic! --> %s", cmd.toString().c_str());
             result.addInt(1);
             result.addString("dummy_id");
             Bottle& lst = result.addList();
