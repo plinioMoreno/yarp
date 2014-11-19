@@ -64,16 +64,16 @@ void PortCoreOutputUnit::run() {
     } else {
         phase.post();
         Route r = getRoute();
-        Logger log(r.toString().c_str(),Logger::get());
+        const char *component = r.toString().c_str();
         while (!closing) {
-            YARP_DEBUG(log, "PortCoreOutputUnit waiting");
+            yCDebugNoFw(component, "PortCoreOutputUnit waiting");
             activate.wait();
-            YARP_DEBUG(log, "PortCoreOutputUnit woken");
+            yCDebugNoFw(component, "PortCoreOutputUnit woken");
             if (!closing) {
                 if (sending) {
-                    YARP_DEBUG(log, "write something in background");
+                    yCDebugNoFw(component, "write something in background");
                     sendHelper();
-                    YARP_DEBUG(log, "wrote something in background");
+                    yCDebugNoFw(component, "wrote something in background");
                     trackerMutex.wait();
                     if (cachedTracker!=NULL) {
                         void *t = cachedTracker;
@@ -86,10 +86,9 @@ void PortCoreOutputUnit::run() {
                     trackerMutex.post();
                 }
             }
-            YARP_DEBUG(log, "wrote something in background");
+            yCDebugNoFw(component, "wrote something in background");
         }
-        YARP_DEBUG(log,
-                   "PortCoreOutputUnit thread closing");
+        yCDebugNoFw(component, "PortCoreOutputUnit thread closing");
         sending = false;
     }
 }

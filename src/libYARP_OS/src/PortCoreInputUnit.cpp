@@ -428,15 +428,15 @@ void PortCoreInputUnit::closeMain() {
     Route r = getRoute();
     access.post();
 
-    Logger log(r.toString().c_str(),Logger::get());
+    const char *component = r.toString().c_str();
 
-    YARP_DEBUG(log,"PortCoreInputUnit closing");
+    yCDebugNoFw(component, "PortCoreInputUnit closing");
 
     if (running) {
-        YARP_DEBUG(log,"PortCoreInputUnit joining");
+        yCDebugNoFw(component, "PortCoreInputUnit joining");
         interrupt();
         join();
-        YARP_DEBUG(log,"PortCoreInputUnit joined");
+        yCDebugNoFw(component, "PortCoreInputUnit joined");
     }
 
     if (ip!=NULL) {

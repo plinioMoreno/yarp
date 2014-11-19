@@ -181,7 +181,7 @@ void PortCore::run() {
         // Attach the connection to this port and update its timeout setting
         if (ip!=NULL) {
             ip->attachPort(contactable);
-            YARP_DEBUG(log,"PortCore received something");
+            yCDebugNoFw("port", "PortCore received something");
             if (timeout>0) {
                 ip->setTimeout(timeout);
             }
@@ -202,7 +202,7 @@ void PortCore::run() {
             if (ip!=NULL) {
                 addInput(ip);
             }
-            YARP_DEBUG(log,"PortCore spun off a connection");
+            yCDebugNoFw("port", "PortCore spun off a connection");
             ip = NULL;
         }
 
@@ -318,7 +318,7 @@ void PortCore::interrupt() {
     // update their state.
     stateMutex.wait();
     if (reader!=NULL) {
-        YARP_DEBUG(log,"sending update-state message to listener");
+        yCDebugNoFw("port", "sending update-state message to listener");
         StreamConnectionReader sbr;
         reader->read(sbr);
     }
@@ -342,7 +342,7 @@ void PortCore::closeMain() {
 
     // Move into official "finishing" phase.
     finishing = true;
-    YARP_DEBUG(log,"now preparing to shut down port");
+    yCDebugNoFw("port", "now preparing to shut down port");
     stateMutex.post();
 
     // Start disconnecting inputs.  We ask the other side of the
@@ -382,8 +382,7 @@ void PortCore::closeMain() {
         }
         stateMutex.post();
         if (!done) {
-            YARP_DEBUG(log,String("requesting removal of connection from ")+
-                       removeName);
+            yCDebugNoFw("port", "requesting removal of connection from %s", removeName.c_str());
             int result = Companion::disconnect(removeName.c_str(),
                                                getName().c_str(),
                                                true);
@@ -474,7 +473,7 @@ void PortCore::closeMain() {
     // with the bad news.  An empty message signifies a request to
     // check the port state.
     if (reader!=NULL) {
-        YARP_DEBUG(log,"sending end-of-port message to listener");
+        yCDebugNoFw("port", "sending end-of-port message to listener");
         StreamConnectionReader sbr;
         reader->read(sbr);
         reader = NULL;
@@ -525,12 +524,12 @@ void PortCore::closeUnits() {
     for (unsigned int i=0; i<units.size(); i++) {
         PortCoreUnit *unit = units[i];
         if (unit!=NULL) {
-            YARP_DEBUG(log,"closing a unit");
+            yCDebugNoFw("port", "closing a unit");
             unit->close();
-            YARP_DEBUG(log,"joining a unit");
+            yCDebugNoFw("port", "joining a unit");
             unit->join();
             delete unit;
-            YARP_DEBUG(log,"deleting a unit");
+            yCDebugNoFw("port", "deleting a unit");
             units[i] = NULL;
         }
     }
@@ -549,14 +548,11 @@ void PortCore::reapUnits() {
             if (unit!=NULL) {
                 if (unit->isDoomed()&&!unit->isFinished()) {
                     String s = unit->getRoute().toString();
-                    YARP_DEBUG(log,String("Informing connection ") +
-                               s + " that it is doomed");
+                    yCDebugNoFw("port", "Informing connection %s that it is doomed", s.c_str());
                     unit->close();
-                    YARP_DEBUG(log,String("Closed connection ") +
-                               s);
+                    yCDebugNoFw("port", "Closed connection %s", s.c_str());
                     unit->join();
-                    YARP_DEBUG(log,String("Joined thread of connection ") +
-                               s);
+                    yCDebugNoFw("port", "Joined thread of connection %s", s.c_str());
                 }
             }
         }
@@ -582,22 +578,22 @@ void PortCore::cleanUnits(bool blocking) {
     int updatedInputCount = 0;
     int updatedOutputCount = 0;
     int updatedDataOutputCount = 0;
-    YARP_DEBUG(log,"/ routine check of connections to this port begins");
+    yCDebugNoFw("port", "/ routine check of connections to this port begins");
     if (!finished) {
 
         // First, we delete and null out any defunct entries in the list.
         for (unsigned int i=0; i<units.size(); i++) {
             PortCoreUnit *unit = units[i];
             if (unit!=NULL) {
-                YARP_DEBUG(log,String("| checking connection ") + unit->getRoute().toString() + " " + unit->getMode());
+                yCDebugNoFw("port", "| checking connection %s %s", unit->getRoute().toString().c_str(), unit->getMode().c_str());
                 if (unit->isFinished()) {
                     String con = unit->getRoute().toString();
-                    YARP_DEBUG(log,String("|   removing connection ") + con);
+                    yCDebugNoFw("port", "|   removing connection %s", con.c_str());
                     unit->close();
                     unit->join();
                     delete unit;
                     units[i] = NULL;
-                    YARP_DEBUG(log,String("|   removed connection ") + con);
+                    yCDebugNoFw("port", "|   removed connection %s", con.c_str());
                 } else {
                     // No work to do except updating connection counts.
                     if (!unit->isDoomed()) {
@@ -644,7 +640,7 @@ void PortCore::cleanUnits(bool blocking) {
     inputCount = updatedInputCount;
     outputCount = updatedOutputCount;
     packetMutex.post();
-    YARP_DEBUG(log,"\\ routine check of connections to this port ends");
+    yCDebugNoFw("port", "\\ routine check of connections to this port ends");
 }
 
 
@@ -727,10 +723,10 @@ bool PortCore::removeUnit(const Route& route, bool synch, bool *except) {
     // input thread.
 
     if (except!=NULL) {
-        YARP_DEBUG(log,String("asked to remove connection in the way of ") + route.toString());
+        yCDebugNoFw("port", "asked to remove connection in the way of %s", route.toString().c_str());
         *except = false;
     } else {
-        YARP_DEBUG(log,String("asked to remove connection ") + route.toString());
+        yCDebugNoFw("port", "asked to remove connection %s", route.toString().c_str());
     }
 
     // Scan for units that match the given route, and collect their IDs.
@@ -763,8 +759,7 @@ bool PortCore::removeUnit(const Route& route, bool synch, bool *except) {
                 }
 
                 if (ok) {
-                    YARP_DEBUG(log,
-                               String("removing connection ") + alt.toString());
+                    yCDebugNoFw("port", "removing connection %s", alt.toString().c_str());
                     removals.push_back(unit->getIndex());
                     unit->setDoomed();
                     needReap = true;
@@ -779,7 +774,7 @@ bool PortCore::removeUnit(const Route& route, bool synch, bool *except) {
     // up eventually, but we can speed this up by waking up the
     // server thread.
     if (needReap) {
-        YARP_DEBUG(log,"one or more connections need prodding to die");
+        yCDebugNoFw("port", "one or more connections need prodding to die");
 
         if (manual) {
             // No server thread, no problems.
@@ -791,11 +786,11 @@ bool PortCore::removeUnit(const Route& route, bool synch, bool *except) {
                 op->close();
                 delete op;
             }
-            YARP_DEBUG(log,"sent message to prod connection death");
+            yCDebugNoFw("port", "sent message to prod connection death");
 
             if (synch) {
                 // Wait for connections to be cleaned up.
-                YARP_DEBUG(log,"synchronizing with connection death");
+                yCDebugNoFw("port", "synchronizing with connection death");
                 bool cont = false;
                 do {
                     stateMutex.wait();
@@ -820,7 +815,7 @@ bool PortCore::removeUnit(const Route& route, bool synch, bool *except) {
 
 bool PortCore::addOutput(const String& dest, void *id, OutputStream *os,
                          bool onlyIfNeeded) {
-    YARP_DEBUG(log,String("asked to add output to ")+dest);
+    yCDebugNoFw("port", "asked to add output to %s", dest.c_str());
 
     // Buffer to store text describing outcome (successful connection,
     // or a failure).
@@ -849,8 +844,7 @@ bool PortCore::addOutput(const String& dest, void *id, OutputStream *os,
                          address.getCarrier()),true,&except);
         if (except) {
             // Connection already present.
-            YARP_DEBUG(log,String("output already present to ")+
-                       dest);
+            yCDebugNoFw("port", "output already present to %s", dest.c_str());
             bw.appendLine(String("Desired connection already present from ") + getName() + " to " + dest);
             if(os!=NULL) bw.write(*os);
             return true;
@@ -927,7 +921,7 @@ bool PortCore::addOutput(const String& dest, void *id, OutputStream *os,
 
         bool ok = op->open(r);
         if (!ok) {
-            YARP_DEBUG(log,"open route error");
+            yCDebugNoFw("port", "open route error");
             delete op;
             op = NULL;
         }
@@ -1426,7 +1420,7 @@ void PortCore::setEnvelope(const String& envelope) {
             break;
         }
     }
-    YARP_DEBUG(log,String("set envelope to ") + this->envelope);
+    yCDebugNoFw("port", "set envelope to %s", this->envelope.c_str());
 }
 
 String PortCore::getEnvelope() {
