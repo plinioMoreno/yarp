@@ -49,7 +49,7 @@ bool PortCore::listen(const Contact& address, bool shouldAnnounce) {
     // If we're using ACE, we really need to have it initialized before
     // this point.
     if (!NetworkBase::initialized()) {
-        YARP_ERROR(log, "YARP not initialized; create a yarp::os::Network object before using ports");
+        yCErrorNoFw("port", "YARP not initialized; create a yarp::os::Network object before using ports");
         return false;
     }
 
