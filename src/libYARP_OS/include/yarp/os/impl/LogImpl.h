@@ -35,10 +35,6 @@ public:
     const unsigned int line;
     const char *func;
 
-    static std::ofstream ftrc; /// Used by yTrace()
-    static std::ofstream fout; /// Used by yDebug() and yInfo()
-    static std::ofstream ferr; /// Used by yWarning(), yError() and yFatal()
-
     static bool colored_output;
     static bool verbose_output;
     static bool debug_output;
