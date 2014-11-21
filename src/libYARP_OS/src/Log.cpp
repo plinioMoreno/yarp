@@ -30,6 +30,7 @@
 #include <yarp/os/Os.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/impl/PlatformStdio.h>
+#include <yarp/os/Semaphore.h>
 
 
 #define YARP_MAX_LOG_MSG_SIZE 512
@@ -217,6 +218,9 @@ void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
     const char *color = logTypeToColor(t);
     const char *bgcolor = logTypeToBgColor(t);
 
+    static yarp::os::Semaphore mutex;
+    mutex.wait();
+
     if (is_yarprun) {
         // Same output as forward_callback
         pristine_output(ost, level, msg, file, line, func, comp);
@@ -244,6 +248,8 @@ void yarp::os::impl::LogImpl::print_callback(yarp::os::Log::LogType t,
     }
 
     *ost << std::endl;
+
+    mutex.post();
 }
 
 void yarp::os::impl::LogImpl::forward_callback(yarp::os::Log::LogType t,
