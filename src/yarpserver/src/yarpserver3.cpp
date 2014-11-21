@@ -83,7 +83,7 @@ public:
         ConstString subdbDefault = ":memory:";
 
         if (options.check("memory")) {
-            fprintf(stderr,"The --memory option was given, but that is now a default. Continuing.\n");
+            yWarningNoFw("The --memory option was given, but that is now a default. Continuing.");
         }
 
         ConstString dbFilename = options.check("portdb",
@@ -97,27 +97,25 @@ public:
         bool verbose = options.check("verbose");
 
         if (!silent) {
-            printf("Using port database: %s\n",
-                   dbFilename.c_str());
-            printf("Using subscription database: %s\n",
-                   subdbFilename.c_str());
+            yInfoNoFw("Using port database: %s", dbFilename.c_str());
+            yInfoNoFw("Using subscription database: %s", subdbFilename.c_str());
             if (dbFilename!=":memory:" || subdbFilename!=":memory:") {
-                printf("If you ever need to clear the name server's state, just delete those files.\n\n");
+                yInfoNoFw("If you ever need to clear the name server's state, just delete those files.");
             }
-            printf("IP address: %s\n",
+            yInfoNoFw("IP address: %s",
                    (ip=="...")?"default":ip.c_str());
-            printf("Port number: %d\n", sock);
+            yInfoNoFw("Port number: %d", sock);
         }
 
         bool reset = false;
         if (options.check("ip")||options.check("socket")) {
-            fprintf(stderr,"Database needs to be reset, IP or port number set.\n");
+            yErrorNoFw("Database needs to be reset, IP or port number set.");
             reset = true;
         }
 
         TripleSource *pmem = db.open(dbFilename.c_str(),cautious,reset);
         if (pmem == NULL) {
-            fprintf(stderr,"Aborting, ports database failed to open.\n");
+            yErrorNoFw("Aborting, ports database failed to open.");
             return false;
         }
         if (verbose) {
@@ -125,7 +123,7 @@ public:
         }
 
         if (!subscriber.open(subdbFilename.c_str())) {
-            fprintf(stderr,"Aborting, subscription database failed to open.\n");
+            yErrorNoFw("Aborting, subscription database failed to open.");
             return false;
         }
         if (verbose) {
@@ -139,7 +137,7 @@ public:
             if (!BootstrapServer::configFileBootstrap(contact,
                                                       options.check("read"),
                                                       options.check("write"))) {
-                fprintf(stderr,"Aborting.\n");
+                yErrorNoFw("Aborting.");
                 return false;
             }
         }
@@ -152,10 +150,10 @@ public:
                 space = new RosNameSpace(c);
                 subscriber.setDelegate(space);
                 ns.setDelegate(space);
-                fprintf(stderr, "Using ROS with ROS_MASTER_URI=%s\n", addr.c_str());
+                yInfoNoFw("Using ROS with ROS_MASTER_URI=%s", addr.c_str());
             } else {
-                fprintf(stderr, "Cannot find ROS, check ROS_MASTER_URI (currently '%s')\n", addr.c_str());
-                ::exit(1);
+                yErrorNoFw("Cannot find ROS, check ROS_MASTER_URI (currently '%s')", addr.c_str());
+                return false;
             }
         }
 
@@ -219,7 +217,7 @@ yarpserversql_API int yarpserver3_main(int argc, char *argv[]) {
         printf("  --ros                    Delegate pub/sub to ROS name server.\n");
         return 0;
     } else {
-        printf("Call with --help for information on available options\n");
+        yInfoNoFw("Call with --help for information on available options");
     }
 
     ConstString configFilename = options.check("config",
@@ -228,10 +226,10 @@ yarpserversql_API int yarpserver3_main(int argc, char *argv[]) {
         configFilename = Network::getConfigFile(configFilename.c_str());
     }
     if (yarp::os::stat(configFilename.c_str())==0) {
-        printf("Reading options from %s\n", configFilename.c_str());
+        yInfoNoFw("Reading options from %s", configFilename.c_str());
         options.fromConfigFile(configFilename.c_str(),false);
     } else {
-        printf("Options can be set on command line or in %s\n", configFilename.c_str());
+        yInfoNoFw("Options can be set on command line or in %s", configFilename.c_str());
     }
 
     Network yarp;
@@ -252,10 +250,9 @@ yarpserversql_API int yarpserver3_main(int argc, char *argv[]) {
     server.setReaderCreator(name);
     bool ok = server.open(nc.where(),false);
     if (!ok) {
-        fprintf(stderr, "Name server failed to open\n");
+        yErrorNoFw("Name server failed to open");
         return 1;
     }
-    printf("\n");
 
 #ifdef YARP_HAS_ACE
     fallback.start();
@@ -263,7 +260,7 @@ yarpserversql_API int yarpserver3_main(int argc, char *argv[]) {
 
     // Repeat registrations for the server and fallback server -
     // these registrations are more complete.
-    printf("Registering name server with itself:\n");
+    yInfoNoFw("Registering name server with itself:");
     nc.preregister(nc.where());
 #ifdef YARP_HAS_ACE
     nc.preregister(fallback.where());
@@ -273,13 +270,13 @@ yarpserversql_API int yarpserver3_main(int argc, char *argv[]) {
         nc.preregister(alt);
     }
     nc.goPublic();
-    printf("Name server can be browsed at http://%s:%d/\n",
+    yInfoNoFw("Name server can be browsed at http://%s:%d/",
            nc.where().getHost().c_str(), nc.where().getPort());
-    printf("\nOk.  Ready!\n");
+    yInfoNoFw("Ok.  Ready!");
 
     while (true) {
         Time::delay(600);
-        printf("Name server running happily\n");
+        yInfoNoFw("Name server running happily");
     }
     server.close();
 

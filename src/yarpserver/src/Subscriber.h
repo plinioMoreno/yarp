@@ -17,6 +17,7 @@
 #include <yarp/os/Vocab.h>
 #include <yarp/os/NameStore.h>
 #include <yarp/os/NameSpace.h>
+#include <yarp/os/Log.h>
 
 /**
  *
@@ -86,7 +87,8 @@ public:
         bool ok = false;
         if (tag=="subscribe"||tag=="unsubscribe"||tag=="announce"||
             tag=="topic"||tag=="untopic"||tag=="type") {
-            if (!silent) printf("-> %s\n", cmd.toString().c_str());
+            if (!silent)
+                yInfoNoFw("-> %s", cmd.toString().c_str());
         }
         if (tag=="subscribe") {
             yarp::os::ConstString src = cmd.get(1).asString();

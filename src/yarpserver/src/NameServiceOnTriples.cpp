@@ -14,6 +14,7 @@
 #include <yarp/os/NestedContact.h>
 #include <yarp/os/Network.h>
 #include <yarp/os/Time.h>
+#include <yarp/os/Log.h>
 #include "NameServiceOnTriples.h"
 #include "ParseName.h"
 
@@ -594,9 +595,7 @@ bool NameServiceOnTriples::apply(yarp::os::Bottle& cmd,
         lastRegister = "";
     }
     if (!silent) {
-        printf("%s%s\n",
-               prefix.c_str(),
-               cmd.toString().c_str());
+        yInfoNoFw("%s%s", prefix.c_str(), cmd.toString().c_str());
     }
 
     TripleSource& mem = *db;
