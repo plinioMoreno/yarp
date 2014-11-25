@@ -110,7 +110,8 @@ public:
                                 const char *,
                                 const char *);
 
-    static void setLogCallback(LogCallback);
+    static void setPrintCallback(LogCallback);
+    static void setForwardCallback(LogCallback);
 
 private:
     yarp::os::impl::LogImpl * const mPriv;

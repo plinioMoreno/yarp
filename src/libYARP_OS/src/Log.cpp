@@ -477,10 +477,16 @@ yarp::os::LogStream yarp::os::Log::nofw_fatal() const
 }
 
 
-void yarp::os::Log::setLogCallback(yarp::os::Log::LogCallback cb)
+void yarp::os::Log::setPrintCallback(yarp::os::Log::LogCallback cb)
 {
     print_callback = cb;
 }
+
+void yarp::os::Log::setForwardCallback(yarp::os::Log::LogCallback cb)
+{
+    forward_callback = cb;
+}
+
 
 void yarp_print_trace(FILE *out, const char *file, int line) {
 #ifdef YARP_HAS_ACE
