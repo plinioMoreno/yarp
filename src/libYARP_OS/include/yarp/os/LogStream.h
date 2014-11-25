@@ -55,11 +55,37 @@ public:
 
     inline ~LogStream() {
         if (!--stream->ref) {
+            std::string s = stream->oss.str();
+            if(!s.empty()) {
+                std::string::size_type pos;
+                // remove the last character if it an empty space (i.e.
+                // always unless the user defined an operator<< that
+                // does not add an empty space.
+                pos = s.find_last_of(' ');
+                if(pos != std::string::npos) {
+                    s.erase(pos);
+                }
+                // remove the last character if it is a \n
+                pos = s.find_last_of('\n');
+                if(pos != std::string::npos) {
+                    s.erase(pos);
+                }
+            }
             if (Log::print_callback) {
-                Log::print_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func, stream->comp);
+                Log::print_callback(stream->type,
+                                    s.c_str(),
+                                    stream->file,
+                                    stream->line,
+                                    stream->func,
+                                    stream->comp);
             }
             if (stream->fw && Log::forward_callback) {
-                Log::forward_callback(stream->type, stream->oss.str().c_str(), stream->file, stream->line, stream->func, stream->comp);
+                Log::forward_callback(stream->type,
+                                      s.c_str(),
+                                      stream->file,
+                                      stream->line,
+                                      stream->func,
+                                      stream->comp);
             }
             if (stream->type == yarp::os::Log::FatalType) {
                 yarp_print_trace(stderr, stream->file, stream->line);
