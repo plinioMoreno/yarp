@@ -30,12 +30,6 @@
 #endif
 
 
-//#define YMSG(x) ACE_OS::printf x;
-//#define YTRACE(x) YMSG(("at %s\n",x))
-
-#define YMSG(x)
-#define YTRACE(x)
-
 using namespace yarp::os::impl;
 using namespace yarp::os;
 using namespace yarp;
@@ -53,7 +47,7 @@ bool PortCore::listen(const Contact& address, bool shouldAnnounce) {
         return false;
     }
 
-    YTRACE("PortCore::listen");
+    yDebugNoFw("PortCore::listen");
 
     stateMutex.wait();
 
@@ -139,7 +133,7 @@ void PortCore::setReadCreator(PortReaderCreator& creator) {
 
 
 void PortCore::run() {
-    YTRACE("PortCore::run");
+    yDebugNoFw("PortCore::run");
 
     // This is the server thread for the port.  We listen on
     // the network and handle any incoming connections.
@@ -163,7 +157,7 @@ void PortCore::run() {
     // This post is matched with a wait in start()
     stateMutex.post();
 
-    YTRACE("PortCore::run running");
+    yDebugNoFw("PortCore::run running");
 
     // Enter main loop, where we block on incoming connections.
     // The loop is exited when PortCore#closing is set.  One last
@@ -227,7 +221,7 @@ void PortCore::run() {
         stateMutex.post();
     }
 
-    YTRACE("PortCore::run closing");
+    yDebugNoFw("PortCore::run closing");
 
     // The server thread is shutting down.
     stateMutex.wait();
@@ -251,7 +245,7 @@ void PortCore::close() {
 
 
 bool PortCore::start() {
-    YTRACE("PortCore::start");
+    yDebugNoFw("PortCore::start");
 
     // This wait will, on success, be matched by a post in run()
     stateMutex.wait();
@@ -327,18 +321,18 @@ void PortCore::interrupt() {
 
 
 void PortCore::closeMain() {
-    YTRACE("PortCore::closeMain");
+    yDebugNoFw("PortCore::closeMain");
 
     stateMutex.wait();
 
     // We may not have anything to do.
     if (finishing||!(running||manual)) {
-        YTRACE("PortCore::closeMainNothingToDo");
+        yDebugNoFw("PortCore::closeMainNothingToDo");
         stateMutex.post();
         return;
     }
 
-    YTRACE("PortCore::closeMainCentral");
+    yDebugNoFw("PortCore::closeMainCentral");
 
     // Move into official "finishing" phase.
     finishing = true;
@@ -658,7 +652,7 @@ void PortCore::addInput(InputProtocol *ip) {
     yAssert(unit!=NULL);
     unit->start();
     units.push_back(unit);
-    YMSG(("there are now %d units\n", (int)units.size()));
+    yDebugNoFw("there are now %zd units\n", units.size());
     stateMutex.post();
 }
 
@@ -1243,7 +1237,7 @@ bool PortCore::sendHelper(PortWriter& writer,
     // copied.  So for example the core image array in a yarp::sig::Image
     // is untouched by the port communications code.
 
-    YMSG(("------- send in real\n"));
+    yDebugNoFw("------- send in real");
 
     // Give user the chance to know that this object is about to be
     // written.
@@ -1263,7 +1257,7 @@ bool PortCore::sendHelper(PortWriter& writer,
         return false;
     }
 
-    YMSG(("------- send in\n"));
+    yDebugNoFw("------- send in");
     // Prepare a "packet" for tracking a single message which
     // may travel by multiple outputs.
     packetMutex.wait();
@@ -1285,11 +1279,11 @@ bool PortCore::sendHelper(PortWriter& writer,
             bool ok = (mode==PORTCORE_SEND_NORMAL)?(!log):(log);
             if (!ok) continue;
             bool waiter = waitAfterSend||(mode==PORTCORE_SEND_LOG);
-            YMSG(("------- -- inc\n"));
+            yDebugNoFw("------- -- inc");
             packetMutex.wait();
             packet->inc();  // One more connection carrying message.
             packetMutex.post();
-            YMSG(("------- -- presend\n"));
+            yDebugNoFw("------- -- presend");
             bool gotReplyOne = false;
             // Send the message off on this connection.
             void *out = unit->send(writer,reader,
@@ -1299,7 +1293,7 @@ bool PortCore::sendHelper(PortWriter& writer,
                                    waiter,waitBeforeSend,
                                    &gotReplyOne);
             gotReply = gotReply||gotReplyOne;
-            YMSG(("------- -- send\n"));
+            yDebugNoFw("------- -- send");
             if (out!=NULL) {
                 // We got back a report of a message already sent.
                 packetMutex.wait();
@@ -1313,25 +1307,25 @@ bool PortCore::sendHelper(PortWriter& writer,
                     all_ok = false;
                 }
             }
-            YMSG(("------- -- dec\n"));
+            yDebugNoFw("------- -- dec");
         }
     }
-    YMSG(("------- pack check\n"));
+    yDebugNoFw("------- pack check");
     packetMutex.wait();
     packet->dec();  // We no longer concern ourselves with the message.
                     // It may or may not be traveling on some connections.
                     // But that is not our problem anymore.
     packets.checkPacket(packet);
     packetMutex.post();
-    YMSG(("------- packed\n"));
-    YMSG(("------- send out\n"));
+    yDebugNoFw("------- packed");
+    yDebugNoFw("------- send out");
     if (mode==PORTCORE_SEND_LOG) {
         if (logCount==0) {
             logNeeded = false;
         }
     }
     stateMutex.post();
-    YMSG(("------- send out real\n"));
+    yDebugNoFw("------- send out real");
 
     if (waitAfterSend) {
         if (reader) {
@@ -1389,14 +1383,14 @@ int PortCore::getOutputCount() {
 
 
 void PortCore::notifyCompletion(void *tracker) {
-    YMSG(("starting notifyCompletion\n"));
+    yDebugNoFw("starting notifyCompletion");
     packetMutex.wait();
     if (tracker!=NULL) {
         ((PortCorePacket *)tracker)->dec();
         packets.checkPacket((PortCorePacket *)tracker);
     }
     packetMutex.post();
-    YMSG(("stopping notifyCompletion\n"));
+    yDebugNoFw("stopping notifyCompletion");
 }
 
 

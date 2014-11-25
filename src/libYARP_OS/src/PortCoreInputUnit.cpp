@@ -21,9 +21,6 @@
 #include <yarp/os/impl/PlatformStdio.h>
 #include <yarp/os/impl/PlatformSignal.h>
 
-//#define YMSG(x) ACE_OS::printf x;
-//#define YTRACE(x) YMSG(("at %s\n",x))
-
 
 using namespace yarp::os::impl;
 using namespace yarp::os;

@@ -27,11 +27,6 @@ using namespace yarp::os::impl;
 
 #define YARP_STRINIT(len) ((size_t) len),0
 
-//#define YMSG(x) ACE_OS::printf x;
-//#define YTRACE(x) YMSG(("at %s\n",x))
-
-#define YMSG(x)
-#define YTRACE(x)
 
 // YARP1 compatible codes
 //const int StoreInt::code = 1;
@@ -372,12 +367,12 @@ Storable *Storable::createByCode(int id) {
 bool BottleImpl::fromBytes(ConnectionReader& reader) {
     if (reader.isError()) return false;
     int id = speciality;
-    YMSG(("READING, nest flag is %d\n", nested));
+    yDebugNoFw("READING, nest flag is %d", nested);
     if (id==0) {
         id = reader.expectInt();
-        YMSG(("READ subcode %d\n", id));
+        yDebugNoFw("READ subcode %d", id);
     } else {
-        YMSG(("READ skipped subcode %d\n", speciality));
+        yDebugNoFw("READ skipped subcode %d", speciality);
     }
     Storable *storable = Storable::createByCode(id);
     if (storable==NULL) {
@@ -420,7 +415,7 @@ bool BottleImpl::fromBytes(const Bytes& data) {
 
         int code = reader.expectInt();
         if (reader.isError()) { return false; }
-        YMSG(("READ got top level code %d\n", code));
+        yDebugNoFw("READ got top level code %d", code);
         code = code & UNIT_MASK;
         if (code!=0) {
             specialize(code);
@@ -428,7 +423,7 @@ bool BottleImpl::fromBytes(const Bytes& data) {
     }
     int len = reader.expectInt();
     if (reader.isError()) { return false; }
-    YMSG(("READ bottle length %d\n", len));
+    yDebugNoFw("READ bottle length %d", len);
     for (int i=0; i<len; i++) {
         bool ok = fromBytes(reader);
         if (!ok) return false;
@@ -445,7 +440,7 @@ void BottleImpl::toBytes(const Bytes& data) {
 
 
 const char *BottleImpl::getBytes() {
-    YMSG(("am I nested? %d\n", nested));
+    yDebugNoFw("am I nested? %d", nested);
     synch();
     return &data[0];
 }
@@ -476,7 +471,7 @@ bool BottleImpl::write(ConnectionWriter& writer) {
         /*
           if (!nested) {
           // No byte count any more, to facilitate nesting
-          //YMSG(("bottle byte count %d\n",byteCount()));
+          //yDebugNoFw("bottle byte count %zd",byteCount());
           //writer.appendInt(byteCount()+sizeof(NetInt32));
 
           writer.appendInt(StoreList::code + speciality);
@@ -534,7 +529,7 @@ bool BottleImpl::read(ConnectionReader& reader) {
 
             int code = reader.expectInt();
             if (reader.isError()) return false;
-            YMSG(("READ got top level code %d\n", code));
+            yDebugNoFw("READ got top level code %d", code);
             code = code & UNIT_MASK;
             if (code!=0) {
                 specialize(code);
@@ -549,7 +544,7 @@ bool BottleImpl::read(ConnectionReader& reader) {
         int i = 0;
         len = reader.expectInt();
         if (reader.isError()) return false;
-        YMSG(("READ got length %d\n", len));
+        yDebugNoFw("READ got length %d", len);
         for (i=0; i<len; i++) {
             bool ok = fromBytes(reader);
             if (!ok) return false;
@@ -563,23 +558,23 @@ void BottleImpl::synch() {
     if (dirty) {
         if (!nested) {
             subCode();
-            YMSG(("bottle code %d\n",StoreList::code + subCode()));
+            yDebugNoFw("bottle code %d",StoreList::code + subCode());
         }
         data.clear();
         BufferedConnectionWriter writer;
         if (!nested) {
             writer.appendInt(StoreList::code + speciality);
-            YMSG(("wrote bottle code %d\n",StoreList::code + speciality));
+            yDebugNoFw("wrote bottle code %d",StoreList::code + speciality);
         }
-        YMSG(("bottle length %d\n",size()));
+        yDebugNoFw("bottle length %zd",size());
         writer.appendInt((int)size());
         for (unsigned int i=0; i<content.size(); i++) {
             Storable *s = content[i];
             if (speciality==0) {
-                YMSG(("subcode %d\n",s->getCode()));
+                yDebugNoFw("subcode %d",s->getCode());
                 writer.appendInt(s->getCode());
             } else {
-                YMSG(("skipped subcode %d\n",s->getCode()));
+                yDebugNoFw("skipped subcode %d",s->getCode());
                 yAssert(speciality==s->getCode());
             }
             if (s->isList()) {

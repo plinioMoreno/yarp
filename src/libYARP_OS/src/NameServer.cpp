@@ -33,11 +33,6 @@
 using namespace yarp::os::impl;
 using namespace yarp::os;
 
-//#define YMSG(x) ACE_OS::printf x;
-//#define YTRACE(x) YMSG(("at %s\n",x))
-
-#define YMSG(x)
-#define YTRACE(x)
 
 // produce a correctly parsed string in presence of quoting
 static ConstString STR_HELP(const char *txt) {
@@ -752,7 +747,7 @@ public:
     }
 
     virtual bool read(ConnectionReader& reader) {
-        YTRACE("NameServer::read start");
+        yTraceNoFw("NameServer::read start");
         String ref = "NAME_SERVER ";
         bool ok = true;
         String msg = "?";
@@ -813,7 +808,7 @@ public:
                 }
             }
         }
-        YTRACE("NameServer::read stop");
+        yTraceNoFw("NameServer::read stop");
         return true;
     }
 };
