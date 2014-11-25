@@ -305,11 +305,11 @@ inline void yarp::os::impl::LogImpl::log(yarp::os::Log::LogType type,
         if (w>0 && buf[w-1]=='\n') {
             buf[w-1]=0;
         }
-        if (print_callback) {
-            print_callback(type, buf, file, line, func, comp);
+        if (yarp::os::Log::print_callback) {
+            yarp::os::Log::print_callback(type, buf, file, line, func, comp);
         }
-        if (forward && forward_callback) {
-            forward_callback(type, buf, file, line, func, comp);
+        if (forward && yarp::os::Log::forward_callback) {
+            yarp::os::Log::forward_callback(type, buf, file, line, func, comp);
         }
     }
 }

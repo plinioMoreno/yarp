@@ -119,7 +119,8 @@ private:
     static LogCallback print_callback;
     static LogCallback forward_callback;
 
-    friend class LogStream;
+    friend class yarp::os::LogStream;
+    friend class yarp::os::impl::LogImpl;
 }; // class Log
 
 } // namespace os
