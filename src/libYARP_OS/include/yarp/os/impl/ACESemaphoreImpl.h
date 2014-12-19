@@ -39,7 +39,7 @@ public:
         if (result!=-1) return;
         int ct = 100;
         while (result == -1 && ct>=0) {
-            yErrorNoFw("semaphore wait failed (errno %d); gdb problem, or bad YARP+ACE flags"), ACE_OS::last_error());
+            yErrorNoFw("semaphore wait failed (errno %d); gdb problem, or bad YARP+ACE flags", ACE_OS::last_error());
             result = sema.acquire();
             ct--;
         }

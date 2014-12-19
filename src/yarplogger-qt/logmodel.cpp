@@ -35,7 +35,7 @@ LogModel::LogModel(QObject *parent) :
         QAbstractTableModel(parent),
 #if defined Q_OS_WIN
         font("Consolas"),
-#elseif defined Q_OS_OSX
+#elif defined Q_OS_OSX
         font("Monaco"),
 #else
         font("Monospace"),
