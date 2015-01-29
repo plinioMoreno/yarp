@@ -336,11 +336,6 @@ MainWindow::MainWindow(QWidget *parent) :
     proxyModel = new YarprunPortsSortFilterProxyModel(this);
     proxyModel->setSourceModel(model_yarprunports);
 
-    statusBarLabel = new QLabel;
-    statusBarLabel->setText("Ready");
-    statusBarLabel->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    statusBar()->addWidget(statusBarLabel);
-
     mainTimer = new QTimer(this);
     connect(mainTimer, SIGNAL(timeout()), this, SLOT(updateMain()));
     mainTimer->start(500);
@@ -423,6 +418,8 @@ void MainWindow::on_yarprunTreeView_doubleClicked(const QModelIndex &pre_index)
     {
         QTabWidget* tab = new QTabWidget(this);
         QVBoxLayout* l= new QVBoxLayout(tab);
+                     l->setContentsMargins(0, 0, 0, 0); 
+                     l->setSpacing(0);
         LogTab* tmpLogTab = new LogTab(theLogger, system_message, tabname.toStdString(), this);
         tmpLogTab->displayYarprunTimestamp(ui->actionShow_YarprunTimestamps->isChecked());
         tmpLogTab->displayLocalTimestamp(ui->actionShow_LocalTimestamps->isChecked());
@@ -682,7 +679,6 @@ void MainWindow::on_actionStart_Logger_triggered()
         ui->actionStop_Logger->setEnabled(true);
         ui->actionRefresh->setEnabled(true);
         system_message->addMessage("Logger started");
-        statusBarLabel->setText("Running");
     }
     else
     {
@@ -698,7 +694,6 @@ void MainWindow::on_actionStop_Logger_triggered()
         ui->actionStop_Logger->setEnabled(false);
         ui->actionRefresh->setEnabled(false);
         system_message->addMessage("Logger stopped");
-        statusBarLabel->setText("Stopped");
     }
     else
     {
@@ -709,7 +704,6 @@ void MainWindow::on_actionStop_Logger_triggered()
 void MainWindow::on_actionRefresh_triggered()
 {
     system_message->addMessage("Searching for yarprun ports");
-    statusBarLabel->setText("Searching for yarprun ports");
     std::list<std::string> ports;
     theLogger->discover(ports);
     updateMain();
@@ -717,7 +711,6 @@ void MainWindow::on_actionRefresh_triggered()
     char text [100];
     sprintf (text,"found %zd ports, logger running", ports.size());
     system_message->addMessage(text);
-    statusBarLabel->setText("Running");
 }
 
 void MainWindow::on_actionClear_triggered()
