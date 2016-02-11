@@ -14,13 +14,13 @@ compiler:
 
 env:
   # Normal build
-  - TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+  - TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
   # Normal build with ninja
-  - TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Ninja" TRAVIS_BUILD_TYPE=DebugFull
+  - TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Ninja" TRAVIS_BUILD_TYPE=RelWithDebInfo
   # No ACE build
-  - TRAVIS_WITH_ACE=false TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+  - TRAVIS_WITH_ACE=false TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
   # Normal build with integration tests (likely to fail due to timeout)
-  - TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=true TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+  - TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=true TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
 
 matrix:
   exclude:
@@ -30,25 +30,25 @@ matrix:
     # Coverage build
     - os: linux
       compiler: gcc
-      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
     # OSX, Unix Makefiles, gcc build
     - os: osx
       compiler: gcc
-      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
     # OSX, Unix Makefiles, clang build
     - os: osx
       compiler: clang
-      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
     # OSX, Xcode, clang build
     - os: osx
       compiler: clang
-      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Xcode" TRAVIS_BUILD_TYPE=DebugFull
+      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Xcode" TRAVIS_BUILD_TYPE=RelWithDebInfo
 
   allow_failures:
-    - env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=true TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=DebugFull
+    - env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=true TRAVIS_CMAKE_GENERATOR="Unix Makefiles" TRAVIS_BUILD_TYPE=RelWithDebInfo
     - os: osx
       compiler: clang
-      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Xcode" TRAVIS_BUILD_TYPE=DebugFull
+      env: TRAVIS_WITH_ACE=true TRAVIS_WITH_INTEGRATION_TESTS=false TRAVIS_CMAKE_GENERATOR="Xcode" TRAVIS_BUILD_TYPE=RelWithDebInfo
 
 branches:
   except:
