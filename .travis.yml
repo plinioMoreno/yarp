@@ -121,7 +121,6 @@ script:
   - if $TRAVIS_WITH_INTEGRATION_TESTS; then bin/yarp conf 0 0 local; fi
   - ctest -VV --build . -C ${TRAVIS_BUILD_TYPE}
   - ctest -N --build . -C ${TRAVIS_BUILD_TYPE}
-  - while $(pwd)/bin/harness_os regression PortTest; do :; done
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/bin/harness_os core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
   - cd ..
 
