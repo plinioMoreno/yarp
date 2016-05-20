@@ -131,7 +131,7 @@ script:
 
 after_success:
   - cd build
-  - coveralls --exclude tests --exclude extern --exclude example --gcov-options '\-lp'
+  - if [ "$TRAVIS_BUILD_TYPE" == "Profile" ]; then coveralls --exclude tests --exclude extern --exclude example --gcov-options '\-lp'; fi
 #   # capture coverage info
 #   - if [ "$TRAVIS_BUILD_TYPE" == "Profile" ]; then lcov --directory . --capture --output-file coverage.info; fi
 #   # filter out system and test code
