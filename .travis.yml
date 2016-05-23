@@ -130,7 +130,6 @@ script:
   - cd ../../..
 
 after_success:
-  - cd build
   - if [ "$TRAVIS_BUILD_TYPE" == "Profile" ]; then coveralls --exclude tests --exclude extern --exclude example --gcov-options '\-lp'; fi
 #   # capture coverage info
 #   - if [ "$TRAVIS_BUILD_TYPE" == "Profile" ]; then lcov --directory . --capture --output-file coverage.info; fi
@@ -140,4 +139,3 @@ after_success:
 #   - if [ "$TRAVIS_BUILD_TYPE" == "Profile" ]; then lcov --list coverage.info; fi
 #   # uploads to coveralls
 #   - if [ "$TRAVIS_BUILD_TYPE" == "Profile" ]; then coveralls-lcov --source-encoding=ISO-8859-1 coverage.info; fi
-  - cd ..
