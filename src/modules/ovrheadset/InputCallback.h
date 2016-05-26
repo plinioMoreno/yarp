@@ -35,6 +35,9 @@ public:
     float rollOffset;
     float pitchOffset;
     float yawOffset;
+
+	int xOffset;
+	int yOffset;
 };
 
 #endif // YARP_OVRHEADSET_INPUTCALLBACK_H
